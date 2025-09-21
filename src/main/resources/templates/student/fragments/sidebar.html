@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sidebar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:fragment="sidebar(fullName, role, activePage)" class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span class="logo">Анализ Успеваемости</span>
+    </div>
+
+    <div class="user-profile">
+        <div class="profile-pic">👤</div>
+        <p class="user-name" th:text="${fullName}"></p>
+    </div>
+
+    <nav class="nav-menu">
+        <ul>
+            <li><a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                <span class="icon">🏠</span> Главная
+            </a></li>
+            <li><a th:href="@{/grades}" th:classappend="${activePage == 'grades'} ? 'active' : ''">
+                <span class="icon">📊</span> Успеваемость
+            </a></li>
+            <li><a th:href="@{/attendance}" th:classappend="${activePage == 'attendance'} ? 'active' : ''">
+                <span class="icon">📅</span> Посещаемость
+            </a></li>
+        </ul>
+    </nav>
+
+    <div class="footer-links">
+        <!-- Новая ссылка для изменения пароля -->
+        <a th:href="@{/change-password}" th:classappend="${activePage == 'change-password'} ? 'change-password-link' : ''" class="change-password-link">
+            <span class="icon">🔒</span>
+            <span class="menu-text">Изменить пароль</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-link">
+                <span class="icon">🚪</span>
+                <span class="menu-text">Выйти</span>
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

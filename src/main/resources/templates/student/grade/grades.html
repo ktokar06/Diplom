@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Успеваемость</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{student/fragments/sidebar :: sidebar (${fullName}, ${role}, 'dashboard')}"></div>
+
+<div class="main-content" id="mainContent">
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Оценки</li>
+            </ol>
+        </nav>
+
+        <h2 class="mb-4">Успеваемость</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Оценки по предметам</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover compact-table">
+                        <thead>
+                        <tr>
+                            <th>Предмет</th>
+                            <th>Семестр</th>
+                            <th>Преподаватель</th>
+                            <th>Средний балл</th>
+                            <th>Кол-во оценок</th>
+                            <th>Прогресс</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="entry : ${cards}">
+                            <td th:text="${entry.value.subject.name}"></td>
+                            <td th:text="${entry.value.subject.semester}"></td>
+                            <td>
+                                <span th:if="${teacherNames.get(entry.key) != null}"
+                                      th:text="${teacherNames.get(entry.key)}"></span>
+                                <span th:unless="${teacherNames.get(entry.key) != null}"
+                                      class="text-muted">Не назначен</span>
+                            </td>
+                            <td class="fw-bold" th:text="${entry.value.avgGrade ?: '—'}"></td>
+                            <td th:text="${entry.value.totalGrades}"></td>
+                            <td>
+                                <div class="progress" style="height: 6px; width: 80px;">
+                                    <div class="progress-bar bg-primary"
+                                         th:style="${entry.value.avgGrade} ? 'width: ' + (${entry.value.avgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <a th:href="@{'/grades/' + ${entry.key}}"
+                                   class="btn btn-sm btn-outline-primary">Подробнее</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${cards.empty}">
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Оценок пока нет
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/login.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

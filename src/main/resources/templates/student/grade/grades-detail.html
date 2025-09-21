@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали успеваемости</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{student/fragments/sidebar :: sidebar (${fullName}, ${role}, 'dashboard')}"></div>
+
+<div class="main-content" id="mainContent">
+    <div class="container mt-4">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/grades}">Оценки</a></li>
+                <li class="breadcrumb-item active" th:text="${subject.name}" aria-current="page"></li>
+            </ol>
+        </nav>
+
+        <h2 class="mb-4" th:text="${subject.name}"></h2>
+
+        <div class="card grade-detail-card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Преподаватель:</strong>
+                            <span th:if="${teacherName != null}"
+                                  th:text="${teacherName}"></span>
+                            <span th:unless="${teacherName != null}" class="text-muted">Не назначен</span>
+                        </p>
+                        <p><strong>Семестр:</strong> <span th:text="${subject.semester}"></span></p>
+                        <p><strong>Количество оценок:</strong> <span th:text="${grades.size()}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <h4>Средний балл</h4>
+                            <h2 th:text="${#numbers.formatDecimal(avgGrade, 1, 2)} ?: '—'"></h2>
+                            <div class="progress" style="height: 8px; background: rgba(255,255,255,0.3);">
+                                <div class="progress-bar bg-white"
+                                     th:style="${avgGrade != null and avgGrade > 0} ? 'width: ' + (${avgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card grade-detail-card">
+                    <div class="card-body text-center">
+                        <h6>Максимальная оценка</h6>
+                        <h3 th:if="${maxGrade != null && maxGrade > 0}"
+                            th:classappend="'grade-badge grade-' + ${maxGrade} + ' large'"
+                            th:text="${maxGrade}"></h3>
+                        <span th:unless="${maxGrade != null && maxGrade > 0}" class="text-muted">—</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card grade-detail-card">
+                    <div class="card-body text-center">
+                        <h6>Минимальная оценка</h6>
+                        <h3 th:if="${minGrade != null && minGrade > 0}"
+                            th:classappend="'grade-badge grade-' + ${minGrade} + ' large'"
+                            th:text="${minGrade}"></h3>
+                        <span th:unless="${minGrade != null && minGrade > 0}" class="text-muted">—</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card grade-detail-card">
+                    <div class="card-body text-center">
+                        <h6>Последняя оценка</h6>
+                        <h3 th:if="${lastGrade != null}"
+                            th:classappend="'grade-badge grade-' + ${lastGrade} + ' large'"
+                            th:text="${lastGrade}"></h3>
+                        <span th:unless="${lastGrade != null}" class="text-muted">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card grade-detail-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">История оценок</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered compact-table">
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Оценка</th>
+                            <th>Тип работы</th>
+                            <th>Комментарий преподавателя</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="grade : ${grades}">
+                            <td th:text="${#temporals.format(grade.assessmentDate, 'dd.MM.yyyy')}"></td>
+                            <td>
+                                <span th:if="${grade.grade != null}"
+                                      th:classappend="'grade-badge grade-' + ${grade.grade}"
+                                      th:text="${grade.grade}"></span>
+                                <span th:unless="${grade.grade != null}" class="text-muted">—</span>
+                            </td>
+                            <td th:text="${grade.workType ?: '—'}"></td>
+                            <td th:text="${grade.comment ?: '—'}" class="text-muted"></td>
+                        </tr>
+                        <tr th:if="${grades.empty}">
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Оценок пока нет
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <a href="/grades" class="btn btn-secondary mt-3">
+            ← Назад к списку предметов
+        </a>
+    </div>
+</div>
+
+<script th:src="@{/js/login.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
