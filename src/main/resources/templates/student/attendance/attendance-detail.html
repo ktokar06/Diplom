@@ -8,140 +8,137 @@
 </head>
 <body>
 
-<div th:replace="~{student/fragments/sidebar :: sidebar (${fullName}, ${role}, 'dashboard')}"></div>
+<div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'dashboard')}"></div>
 
 <div class="main-content" id="mainContent">
-    <div class="content">
-        <div class="container mt-4">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/attendance}">Посещаемость</a></li>
-                    <li class="breadcrumb-item active" th:text="${subject.name}"></li>
-                </ol>
-            </nav>
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/attendance}">Посещаемость</a></li>
+                <li class="breadcrumb-item active" th:text="${subject.name}"></li>
+            </ol>
+        </nav>
 
-            <h2 class="mb-4" th:text="${subject.name}"></h2>
+        <h2 class="mb-4" th:text="${subject.name}"></h2>
 
-            <div class="card attendance-detail-card mb-4">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Преподаватель:</strong>
-                                <!-- Исправлено: subject.id -> subject.subjectId -->
-                                <span th:if="${teacherNames.get(subject.subjectId) != null}"
-                                      th:text="${teacherNames.get(subject.subjectId)}"></span>
-                                <span th:unless="${teacherNames.get(subject.subjectId) != null}" class="text-muted">Не назначен</span>
-                            </p>
-                            <p><strong>Семестр:</strong> <span th:text="${subject.semester}"></span></p>
-                            <p><strong>Всего занятий:</strong> <span th:text="${totalClasses}"></span></p>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="stat-card stat-present">
-                                <h4>Процент посещаемости</h4>
-                                <h2 th:text="${attendancePercentage} + '%'"></h2>
-                                <div class="progress" style="height: 8px; background: rgba(255,255,255,0.3);">
-                                    <div class="progress-bar bg-white"
-                                         th:style="'width: ' + ${attendancePercentage} + '%'"></div>
-                                </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Преподаватель:</strong>
+                            <span th:if="${teacherNames.get(subject.subjectId) != null}"
+                                  th:text="${teacherNames.get(subject.subjectId)}"></span>
+                            <span th:unless="${teacherNames.get(subject.subjectId) != null}" class="text-muted">Не назначен</span>
+                        </p>
+                        <p><strong>Семестр:</strong> <span th:text="${subject.semester}"></span></p>
+                        <p><strong>Всего занятий:</strong> <span th:text="${totalClasses}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-success text-white rounded">
+                            <h4>Процент посещаемости</h4>
+                            <h2 th:text="${attendancePercentage} + '%'"></h2>
+                            <div class="progress" style="height: 8px; background: rgba(255,255,255,0.3);">
+                                <div class="progress-bar bg-white"
+                                     th:style="'width: ' + ${attendancePercentage} + '%'"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="stat-card stat-present">
-                        <div class="text-center">
-                            <h6>Присутствовал</h6>
-                            <h3 th:text="${presentCount}"></h3>
-                            <p th:text="'(' + ${presentPercentage} + '%)'"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-card stat-absent">
-                        <div class="text-center">
-                            <h6>Пропущено</h6>
-                            <h3 th:text="${absentCount}"></h3>
-                            <p th:text="'(' + ${absentPercentage} + '%)'"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-card stat-late">
-                        <div class="text-center">
-                            <h6>Опоздал</h6>
-                            <h3 th:text="${lateCount ?: 0}"></h3>
-                            <p th:text="'(' + ${latePercentage ?: 0} + '%)'"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card attendance-detail-card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">Распределение посещаемости</h5>
-                    <div class="attendance-distribution">
-                        <div class="attendance-type">
-                            <div class="attendance-circle circle-present" th:text="${presentCount}"></div>
-                            <div>Присутствовал</div>
-                        </div>
-                        <div class="attendance-type">
-                            <div class="attendance-circle circle-absent" th:text="${absentCount}"></div>
-                            <div>Пропущено</div>
-                        </div>
-                        <div class="attendance-type">
-                            <div class="attendance-circle circle-late" th:text="${lateCount ?: 0}"></div>
-                            <div>Опоздал</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card attendance-detail-card">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">История посещений</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered compact-table">
-                            <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Семестр</th>
-                                <th>Статус</th>
-                                <th>Примечание</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="attendance : ${attendances}">
-                                <td th:text="${#temporals.format(attendance.attendanceDate, 'dd.MM.yyyy')}"></td>
-                                <td th:text="${attendance.subject.semester ?: '—'}"></td>
-                                <td>
-                                    <span th:if="${attendance.isPresent == true}"
-                                          class="status-badge bg-present">Присутствовал</span>
-                                    <span th:if="${attendance.isPresent == false}"
-                                          class="status-badge bg-absent">Пропустил</span>
-                                    <span th:if="${attendance.isPresent == null}"
-                                          class="status-badge bg-late">Опоздал</span>
-                                </td>
-                                <td th:text="${attendance.comment ?: '—'}" class="text-muted"></td>
-                            </tr>
-                            <tr th:if="${attendances.empty}">
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    Записей о посещаемости пока нет
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <a th:href="@{/attendance}" class="btn btn-secondary mt-3">
-                ← Назад к списку предметов
-            </a>
         </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h6>Присутствовал</h6>
+                        <h3 th:text="${presentCount}"></h3>
+                        <p th:text="'(' + ${presentPercentage} + '%)'"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h6>Пропущено</h6>
+                        <h3 th:text="${absentCount}"></h3>
+                        <p th:text="'(' + ${absentPercentage} + '%)'"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <h6>Опоздал</h6>
+                        <h3 th:text="${lateCount ?: 0}"></h3>
+                        <p th:text="'(' + ${latePercentage ?: 0} + '%)'"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Распределение посещаемости</h5>
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px; font-size: 1.5rem;" th:text="${presentCount}"></div>
+                        <div>Присутствовал</div>
+                    </div>
+                    <div>
+                        <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px; font-size: 1.5rem;" th:text="${absentCount}"></div>
+                        <div>Пропущено</div>
+                    </div>
+                    <div>
+                        <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px; font-size: 1.5rem;" th:text="${lateCount ?: 0}"></div>
+                        <div>Опоздал</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">История посещений</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Семестр</th>
+                            <th>Статус</th>
+                            <th>Примечание</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="attendance : ${attendances}">
+                            <td th:text="${#temporals.format(attendance.attendanceDate, 'dd.MM.yyyy')}"></td>
+                            <td th:text="${attendance.subject.semester ?: '—'}"></td>
+                            <td>
+                                <span th:if="${attendance.isPresent == true}"
+                                      class="badge bg-success">Присутствовал</span>
+                                <span th:if="${attendance.isPresent == false}"
+                                      class="badge bg-danger">Пропустил</span>
+                                <span th:if="${attendance.isPresent == null}"
+                                      class="badge bg-warning">Опоздал</span>
+                            </td>
+                            <td th:text="${attendance.comment ?: '—'}" class="text-muted"></td>
+                        </tr>
+                        <tr th:if="${attendances.empty}">
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Записей о посещаемости пока нет
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <a th:href="@{/attendance}" class="btn btn-secondary mt-3">
+            ← Назад к списку предметов
+        </a>
     </div>
 </div>
 

@@ -1,61 +1,61 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const groupSelect = document.getElementById('group');
-    const userSelect = document.getElementById('username');
+ document.addEventListener('DOMContentLoaded', function () {
+        const groupSelect = document.getElementById('group');
+        const userSelect = document.getElementById('username');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
 
-    // Функция обновления списка пользователей
-    function updateUserList(users, isTeacher) {
-        userSelect.innerHTML = '<option value="">Выберите ' + (isTeacher ? 'преподавателя' : 'студента') + '</option>';
-
-        if (users && users.length > 0) {
-            for (var i = 0; i < users.length; i++) {
-                var user = users[i];
-                var option = document.createElement('option');
-                if (isTeacher) {
-                    var fullName = user.fullName || '';
-                    option.value = fullName;
-                    option.textContent = fullName;
+        // Функция для переключения видимости пароля
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
                 } else {
-                    var fullName = user.fullName || '';
-                    var ticketNumber = user.studentTicketNumber || '';
-                    option.value = ticketNumber;
-                    option.textContent = fullName;
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
                 }
-                if (option.value) {
-                    userSelect.appendChild(option);
-                }
-            }
+            });
         }
-    }
 
-    // Обработчик события изменения выбора группы
-    groupSelect.addEventListener('change', function () {
-        var selectedGroupId = this.value;
+        // Функция обновления списка студентов
+        function updateStudentList(students) {
+            userSelect.innerHTML = '<option value="">Выберите студента</option>';
 
-        if (selectedGroupId === 'teachers') {
-            if (window.teachers && Array.isArray(window.teachers)) {
-                updateUserList(window.teachers, true);
-            } else {
-                userSelect.innerHTML = '<option value="">Преподаватели не найдены</option>';
-            }
-        } else if (selectedGroupId) {
-            var groupId = parseInt(selectedGroupId);
-            if (window.studentsMap && window.studentsMap[groupId]) {
-                updateUserList(window.studentsMap[groupId], false);
+            if (students && students.length > 0) {
+                students.forEach(function(student) {
+                    var option = document.createElement('option');
+                    var fullName = student.fullName || '';
+                    var ticketNumber = student.studentTicketNumber || '';
+                    option.value = ticketNumber;
+                    option.textContent = fullName + ' (' + ticketNumber + ')';
+                    userSelect.appendChild(option);
+                });
             } else {
                 userSelect.innerHTML = '<option value="">Студенты не найдены</option>';
             }
-        } else {
-            userSelect.innerHTML = '<option value="">Сначала выберите группу</option>';
+        }
+
+        // Обработчик изменения выбора группы
+        if (groupSelect) {
+            groupSelect.addEventListener('change', function () {
+                var selectedGroupId = this.value;
+
+                if (selectedGroupId) {
+                    // Преобразуем ID группы в число для сравнения
+                    var groupId = parseInt(selectedGroupId);
+
+                    // Ищем студентов для выбранной группы
+                    if (studentsMap && studentsMap[groupId]) {
+                        updateStudentList(studentsMap[groupId]);
+                    } else {
+                        userSelect.innerHTML = '<option value="">Студенты не найдены</option>';
+                    }
+                } else {
+                    userSelect.innerHTML = '<option value="">Сначала выберите группу</option>';
+                }
+            });
         }
     });
-
-    // Функция переключения видимости пароля
-    window.togglePassword = function() {
-        var passwordInput = document.getElementById('password');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-        } else {
-            passwordInput.type = 'password';
-        }
-    };
-});

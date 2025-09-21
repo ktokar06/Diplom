@@ -2,10 +2,8 @@ package com.example.controller;
 
 import com.example.model.entity.Group;
 import com.example.model.entity.Student;
-import com.example.model.entity.Teacher;
 import com.example.repository.GroupRepository;
 import com.example.repository.StudentRepository;
-import com.example.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +19,6 @@ import java.util.Map;
 public class LoginController {
 
     private final GroupRepository groupRepository;
-    private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
 
     @GetMapping("/login")
@@ -30,7 +27,6 @@ public class LoginController {
                             @RequestParam(value = "logout", required = false) String logout) {
 
         List<Group> groups = groupRepository.findAll();
-        List<Teacher> teachers = teacherRepository.findAll();
         Map<Long, List<Student>> studentsMap = new HashMap<>();
 
         for (Group group : groups) {
@@ -38,7 +34,6 @@ public class LoginController {
         }
 
         model.addAttribute("groups", groups);
-        model.addAttribute("teachers", teachers);
         model.addAttribute("studentsMap", studentsMap);
 
         if (error != null) {

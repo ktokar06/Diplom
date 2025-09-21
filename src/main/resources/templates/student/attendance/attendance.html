@@ -8,59 +8,61 @@
 </head>
 <body>
 
-<div th:replace="~{student/fragments/sidebar :: sidebar (${fullName}, ${role}, 'dashboard')}"></div>
+<div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'dashboard')}"></div>
 
 <div class="main-content" id="mainContent">
-  <div class="content">
-    <div class="container mt-4">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Посещаемость</li>
-        </ol>
-      </nav>
+  <div class="container mt-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Главная</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Посещаемость</li>
+      </ol>
+    </nav>
 
-      <h2 class="mb-4">Посещаемость</h2>
+    <h2 class="mb-4">Посещаемость</h2>
 
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Статистика посещаемости</h5>
-          <div class="table-responsive">
-            <table class="table table-hover compact-table">
-              <thead>
-              <tr>
-                <th>Предмет</th>
-                <th>Семестр</th>
-                <th>Присутствовал</th>
-                <th>Пропущено</th>
-                <th>Процент</th>
-                <th>Действия</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr th:each="entry : ${cards}">
-                <td th:text="${entry.value.subject.name}"></td>
-                <td th:text="${entry.value.subject.semester}"></td>
-                <td class="text-success" th:text="${entry.value.present}"></td>
-                <td class="text-danger" th:text="${entry.value.absent}"></td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="progress me-2" style="width: 60px; height: 6px;">
-                      <div class="progress-bar bg-success"
-                           th:style="'width: ' + (${entry.value.total > 0 ? (entry.value.present * 100.0 / entry.value.total) : 0}) + '%'"></div>
-                    </div>
-                    <span th:text="${#numbers.formatDecimal(entry.value.total > 0 ? (entry.value.present * 100.0 / entry.value.total) : 0, 1, 1)} + '%'"></span>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Статистика посещаемости</h5>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+            <tr>
+              <th>Предмет</th>
+              <th>Семестр</th>
+              <th>Присутствовал</th>
+              <th>Пропущено</th>
+              <th>Процент</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${cards}">
+              <td th:text="${entry.value.subject.name}"></td>
+              <td th:text="${entry.value.subject.semester}"></td>
+              <td class="text-success" th:text="${entry.value.present}"></td>
+              <td class="text-danger" th:text="${entry.value.absent}"></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="progress me-2" style="width: 60px; height: 6px;">
+                    <div class="progress-bar bg-success"
+                         th:style="'width: ' + (${entry.value.total > 0 ? (entry.value.present * 100.0 / entry.value.total) : 0}) + '%'"></div>
                   </div>
-                </td>
-                <td>
-                  <a th:href="@{'/attendance/' + ${entry.value.subject.subjectId}}"
-                     class="btn btn-sm btn-outline-primary">Подробнее
-                  </a>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
+                  <span th:text="${#numbers.formatDecimal(entry.value.total > 0 ? (entry.value.present * 100.0 / entry.value.total) : 0, 1, 1)} + '%'"></span>
+                </div>
+              </td>
+              <td>
+                <a th:href="@{'/attendance/' + ${entry.value.subject.subjectId}}"
+                   class="btn btn-sm btn-outline-primary">Подробнее</a>
+              </td>
+            </tr>
+            <tr th:if="${cards.empty}">
+              <td colspan="6" class="text-center text-muted py-4">
+                Записей о посещаемости пока нет
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -69,8 +69,9 @@ public class DashboardController {
         Map<Long, String> teacherNames = buildTeacherNames(subjectsData.keySet());
         model.addAttribute("subjects", subjectsData.values());
         model.addAttribute("teacherNames", teacherNames);
-    }
 
+        model.addAttribute("group", student.getGroup());
+    }
     private Map<Long, String> buildTeacherNames(Iterable<Long> subjectIds) {
         Map<Long, String> teacherNames = new HashMap<>();
         for (Long subjectId : subjectIds) {

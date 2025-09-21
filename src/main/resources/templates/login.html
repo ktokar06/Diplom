@@ -2,73 +2,70 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Вход</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Вход для студентов</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="login-body">
-<div class="login-page">
-    <div class="form-card">
-        <div class="logo-wrapper">
-            <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg" alt="MTUCI Logo" class="mtuci-logo"/>
-        </div>
+<div class="login-container">
+    <div class="card login-card">
+        <div class="card-body">
 
-        <h2 class="card-title">Вход в систему</h2>
+            <div class="text-center mb-4">
+                <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg" alt="MTUCI Logo" class="login-logo"/>
+            </div>
 
-        <form id="loginForm" method="post" th:action="@{/login}">
-            <div class="form-group">
-                <label for="group">Группа</label>
-                <div class="select-container">
-                    <select id="group" name="group" class="form-control" required>
+            <h2 class="login-title">Вход в систему</h2>
+
+            <form id="loginForm" method="post" th:action="@{/login}" class="login-form">
+                <div class="mb-3">
+                    <label for="group" class="form-label">Группа</label>
+                    <select id="group" name="group" class="form-select" required>
                         <option value="">Выберите группу</option>
                         <option th:each="group : ${groups}"
                                 th:value="${group.id}"
                                 th:text="${group.name} + ' - ' + ${group.specialityCode}">
                         </option>
-                        <option value="teachers">Преподавательский состав</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="username">Пользователь</label>
-                <div class="select-container">
-                    <select id="username" name="username" class="form-control" required>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Студент</label>
+                    <select id="username" name="username" class="form-select" required>
                         <option value="">Сначала выберите группу</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="password">Пароль</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль" required/>
-                    <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Показать/скрыть пароль">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M8 3C3 3 1 8 1 8C1 8 3 13 8 13C13 13 15 8 15 8C15 8 13 3 8 3Z" stroke="#999" stroke-width="1"/>
-                            <circle cx="8" cy="8" r="2" stroke="#999" stroke-width="1"/>
-                        </svg>
-                    </button>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль" required/>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="login-button">Войти</button>
+                <div class="d-grid">
+                    <button type="submit" class="btn login-btn">Войти</button>
+                </div>
 
-            <div th:if="${errorMessage}" class="error-message mt-small" th:text="${errorMessage}">Ошибка входа</div>
-            <div th:if="${message}" class="success-message mt-small" th:text="${message}">Сообщение</div>
-        </form>
+                <div th:if="${errorMessage}" class="alert alert-danger mt-3" th:text="${errorMessage}">Ошибка входа</div>
+                <div th:if="${message}" class="alert alert-success mt-3" th:text="${message}">Сообщение</div>
+            </form>
+        </div>
     </div>
 </div>
 
-<script th:src="@{/js/login.js}"></script>
-
 <script th:inline="javascript">
-    /* <![CDATA[ */
-    window.teachers = /*[[${teachers}]]*/ [];
-    window.studentsMap = /*[[${studentsMap}]]*/ {};
-    /* ]]> */
+    /*<![CDATA[*/
+    // Правильный способ передачи данных из Thymeleaf в JavaScript
+    var studentsMap = /*[[${studentsMap}]]*/ {};
+    /*]]>*/
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/login.js"></script>
 </body>
 </html>

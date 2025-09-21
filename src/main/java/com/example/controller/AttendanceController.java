@@ -37,7 +37,7 @@ public class AttendanceController {
 
         model.addAttribute("cards", cards);
         model.addAttribute("teacherNames", teacherNames);
-        return "student/attendance/attendance"; // Исправленный путь
+        return "student/attendance/attendance";
     }
 
     @GetMapping("/attendance/{subjectId}")
