@@ -9,14 +9,18 @@
 <body>
 
 <div th:fragment="header(fullName, role, activePage)">
+
     <header class="p-2 mb-3 border-bottom">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start">
 
                 <div class="d-flex align-items-center me-3">
-                    <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg"
-                         alt="MTUCI Logo"
-                         style="height: 55px; width: auto; margin-right: 8px;">
+                    <picture>
+                        <source srcset="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg" type="image/svg+xml">
+                        <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg"
+                             alt="MTUCI Logo"
+                             style="height: 55px; width: auto; margin-right: 8px;">
+                    </picture>
                 </div>
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -27,11 +31,15 @@
 
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                             alt="Пользователь"
-                             width="32"
-                             height="32"
-                             class="rounded-circle">
+                        <picture>
+                            <source srcset="https://cdn-icons-png.flaticon.com/512/149/149071.png" type="image/png">
+                            <source srcset="https://cdn-icons-png.flaticon.com/512/149/149071.webp" type="image/webp">
+                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                 alt="Пользователь"
+                                 width="32"
+                                 height="32"
+                                 class="rounded-circle">
+                        </picture>
                     </a>
                     <ul class="dropdown-menu text-small">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Изменить пароль</a></li>
