@@ -10,7 +10,6 @@
 
 <div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'dashboard')}"></div>
 
-
 <div class="main-content" id="mainContent">
     <div class="container mt-4">
         <nav aria-label="breadcrumb">
@@ -48,12 +47,12 @@
                                 <span th:unless="${teacherNames.get(entry.key) != null}"
                                       class="text-muted">Не назначен</span>
                             </td>
-                            <td class="fw-bold" th:text="${entry.value.avgGrade ?: '—'}"></td>
+                            <td class="fw-bold" th:text="${entry.value.avgGrade != null ? #numbers.formatDecimal(entry.value.avgGrade, 1, 2) : '—'}"></td>
                             <td th:text="${entry.value.totalGrades}"></td>
                             <td>
                                 <div class="progress" style="height: 6px; width: 80px;">
                                     <div class="progress-bar bg-primary"
-                                         th:style="${entry.value.avgGrade} ? 'width: ' + (${entry.value.avgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
+                                         th:style="${entry.value.avgGrade != null} ? 'width: ' + (${entry.value.avgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
                                 </div>
                             </td>
                             <td>
@@ -75,5 +74,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

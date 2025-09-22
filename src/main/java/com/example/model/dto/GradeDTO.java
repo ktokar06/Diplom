@@ -4,7 +4,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class GradeRequest {
+public class GradeDTO {
     private Long studentId;
     private Long subjectId;
     private Integer grade;

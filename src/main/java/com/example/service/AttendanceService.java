@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
+/**
+ * Сервис для работы с посещаемостью студентов.
+ */
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
@@ -19,76 +21,115 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final SubjectRepository subjectRepository;
 
+    /**
+     * Формирует панель посещаемости студента по предметам.
+     *
+     * @param studentId ID студента.
+     * @return карта с данными посещаемости по предметам.
+     */
     public Map<Long, Map<String, Object>> getAttendanceDashboard(Long studentId) {
-        return attendanceRepository.findByStudentId(studentId).stream()
-                .collect(Collectors.groupingBy(attendance -> attendance.getSubject().getSubjectId()))
-                .entrySet().stream()
-                .filter(entry -> subjectRepository.findById(entry.getKey()).isPresent())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> {
-                            Long subjectId = entry.getKey();
-                            List<Attendance> attendances = entry.getValue();
-                            Subject subject = subjectRepository.findById(subjectId).orElseThrow();
+        List<Attendance> allAttendances = attendanceRepository.findByStudentId(studentId);
+        Map<Long, List<Attendance>> groupedBySubject = new HashMap<>();
 
-                            Map<String, Object> subjectStats = new HashMap<>();
-                            subjectStats.put("subject", subject);
 
-                            long present = attendances.stream()
-                                    .filter(att -> Boolean.TRUE.equals(att.getIsPresent()))
-                                    .count();
-                            long absent = attendances.stream()
-                                    .filter(att -> Boolean.FALSE.equals(att.getIsPresent()))
-                                    .count();
+        for (Attendance attendance : allAttendances) {
+            Long subjectId = attendance.getSubject().getSubjectId();
+            groupedBySubject.computeIfAbsent(subjectId, k -> new ArrayList<>()).add(attendance);
+        }
 
-                            subjectStats.put("present", present);
-                            subjectStats.put("absent", absent);
-                            subjectStats.put("total", attendances.size());
+        Map<Long, Map<String, Object>> dashboard = new HashMap<>();
+        for (Map.Entry<Long, List<Attendance>> entry : groupedBySubject.entrySet()) {
+            Long subjectId = entry.getKey();
+            Optional<Subject> subjectOpt = subjectRepository.findById(subjectId);
 
-                            return subjectStats;
-                        }
-                ));
+            if (subjectOpt.isPresent()) {
+                Subject subject = subjectOpt.get();
+                List<Attendance> attendances = entry.getValue();
+
+                long present = 0;
+                long absent = 0;
+                for (Attendance att : attendances) {
+                    if (Boolean.TRUE.equals(att.getIsPresent())) {
+                        present++;
+                    } else if (Boolean.FALSE.equals(att.getIsPresent())) {
+                        absent++;
+                    }
+                }
+
+                Map<String, Object> subjectData = new HashMap<>();
+                subjectData.put("subject", subject);
+                subjectData.put("present", present);
+                subjectData.put("absent", absent);
+                subjectData.put("total", attendances.size());
+
+                dashboard.put(subjectId, subjectData);
+            }
+        }
+        return dashboard;
     }
 
+    /**
+     * Получает детали посещаемости по конкретному предмету.
+     *
+     * @param subjectId ID предмета.
+     * @param studentId ID студента.
+     * @return данные по посещаемости.
+     */
     public Map<String, Object> getAttendanceDetails(Long subjectId, Long studentId) {
-        return subjectRepository.findById(subjectId).map(subject -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("subject", subject);
+        Optional<Subject> subjectOpt = subjectRepository.findById(subjectId);
 
-            List<Attendance> attendances = attendanceRepository
-                    .findByStudentIdAndSubjectSubjectIdOrderByAttendanceDateDesc(studentId, subjectId);
-            result.put("attendances", attendances);
+        if (subjectOpt.isEmpty()) {
+            return null;
+        }
 
-            long presentCount = attendances.stream()
-                    .filter(att -> Boolean.TRUE.equals(att.getIsPresent()))
-                    .count();
-            long absentCount = attendances.stream()
-                    .filter(att -> Boolean.FALSE.equals(att.getIsPresent()))
-                    .count();
-            long lateCount = attendances.stream()
-                    .filter(att -> att.getIsPresent() == null)
-                    .count();
+        Subject subject = subjectOpt.get();
+        List<Attendance> attendances = attendanceRepository
+                .findByStudentIdAndSubjectSubjectIdOrderByAttendanceDateDesc(studentId, subjectId);
 
-            int totalCount = attendances.size();
+        long presentCount = 0;
+        long absentCount = 0;
+        long lateCount = 0;
 
-            result.put("presentCount", presentCount);
-            result.put("absentCount", absentCount);
-            result.put("lateCount", lateCount);
-            result.put("totalClasses", totalCount);
+        for (Attendance att : attendances) {
+            if (Boolean.TRUE.equals(att.getIsPresent())) {
+                presentCount++;
+            } else if (Boolean.FALSE.equals(att.getIsPresent())) {
+                absentCount++;
+            } else {
+                lateCount++;
+            }
+        }
 
-            double attendancePercentage = calculatePercentage(presentCount, totalCount);
-            result.put("attendancePercentage", attendancePercentage);
+        int totalCount = attendances.size();
+        double attendancePercentage = calculatePercentage(presentCount, totalCount);
 
-            result.put("presentPercentage", calculatePercentage(presentCount, totalCount));
-            result.put("absentPercentage", calculatePercentage(absentCount, totalCount));
-            result.put("latePercentage", calculatePercentage(lateCount, totalCount));
+        Map<String, Object> details = new HashMap<>();
+        details.put("subject", subject);
+        details.put("attendances", attendances);
+        details.put("presentCount", presentCount);
+        details.put("absentCount", absentCount);
+        details.put("lateCount", lateCount);
+        details.put("totalClasses", totalCount);
+        details.put("attendancePercentage", attendancePercentage);
+        details.put("presentPercentage", calculatePercentage(presentCount, totalCount));
+        details.put("absentPercentage", calculatePercentage(absentCount, totalCount));
+        details.put("latePercentage", calculatePercentage(lateCount, totalCount));
 
-            return result;
-        }).orElse(null);
+        return details;
     }
 
+    /**
+     * Вычисляет процентное соотношение.
+     *
+     * @param part  часть от общего числа.
+     * @param total общее число.
+     * @return округлённый процент.
+     */
     private double calculatePercentage(long part, int total) {
-        if (total <= 0) return 0.0;
+        if (total <= 0) {
+            return 0.0;
+        }
+
         return BigDecimal.valueOf((double) part / total * 100)
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();

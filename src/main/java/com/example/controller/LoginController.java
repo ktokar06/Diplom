@@ -30,7 +30,8 @@ public class LoginController {
         Map<Long, List<Student>> studentsMap = new HashMap<>();
 
         for (Group group : groups) {
-            studentsMap.put(group.getId(), studentRepository.findByGroupId(group.getId()));
+            List<Student> students = studentRepository.findByGroupId(group.getId());
+            studentsMap.put(group.getId(), students);
         }
 
         model.addAttribute("groups", groups);

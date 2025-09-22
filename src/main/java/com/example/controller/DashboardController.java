@@ -11,9 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,9 +24,23 @@ public class DashboardController {
     private final TeacherRepository teacherRepository;
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(Model model,
+                            @RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "success", required = false) String success) {
+
+        if ("passwordMismatch".equals(error)) {
+            model.addAttribute("errorMessage", "Пароли не совпадают!");
+        } else if ("passwordTooShort".equals(error)) {
+            model.addAttribute("errorMessage", "Пароль должен быть не менее 6 символов!");
+        }
+
+        if ("passwordChanged".equals(success)) {
+            model.addAttribute("successMessage", "Пароль успешно изменён!");
+        }
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
+
+        if (auth == null || "anonymousUser".equals(auth.getPrincipal())) {
             return "redirect:/login";
         }
 
@@ -39,12 +53,13 @@ public class DashboardController {
         model.addAttribute("fullName", fullName);
         model.addAttribute("activePage", "dashboard");
 
-        if ("STUDENT".equals(role)) {
-            var studentOpt = studentRepository.findByStudentTicketNumber(username);
-            if (studentOpt.isPresent()) {
-                var student = studentOpt.get();
+        if ("ROLE_STUDENT".equals(role)) {
+            Student student = studentRepository.findByStudentTicketNumber(username).orElse(null);
+
+            if (student != null) {
                 addStudentDataToModel(model, student);
             }
+
             return "student/dashboard";
         }
 
@@ -52,32 +67,30 @@ public class DashboardController {
     }
 
     private String determineFullName(String username, String role) {
-        switch (role) {
-            case "STUDENT":
-                var studentOpt = studentRepository.findByStudentTicketNumber(username);
-                return studentOpt.map(Student::getFullName).orElse(username);
-            case "TEACHER":
-                var teacherOpt = teacherRepository.findByFullName(username);
-                return teacherOpt.map(Teacher::getFullName).orElse(username);
-            default:
-                return username;
+        if ("ROLE_STUDENT".equals(role)) {
+            return studentRepository.findByStudentTicketNumber(username)
+                    .map(Student::getFullName)
+                    .orElse(username);
+        } else if ("ROLE_TEACHER".equals(role)) {
+            return teacherRepository.findByFullName(username)
+                    .map(Teacher::getFullName)
+                    .orElse(username);
         }
+
+        return username;
     }
 
     private void addStudentDataToModel(Model model, Student student) {
         Map<Long, Map<String, Object>> subjectsData = gradeService.getGradesDashboard(student.getId());
-        Map<Long, String> teacherNames = buildTeacherNames(subjectsData.keySet());
+        Map<Long, String> teacherNames = new HashMap<>();
+
+        for (Long subjectId : subjectsData.keySet()) {
+            String names = String.join(", ", gradeService.getTeacherNamesBySubjectId(subjectId));
+            teacherNames.put(subjectId, names);
+        }
+
         model.addAttribute("subjects", subjectsData.values());
         model.addAttribute("teacherNames", teacherNames);
-
         model.addAttribute("group", student.getGroup());
-    }
-    private Map<Long, String> buildTeacherNames(Iterable<Long> subjectIds) {
-        Map<Long, String> teacherNames = new HashMap<>();
-        for (Long subjectId : subjectIds) {
-            var names = gradeService.getTeacherNamesBySubjectId(subjectId);
-            teacherNames.put(subjectId, String.join(", ", names));
-        }
-        return teacherNames;
     }
 }

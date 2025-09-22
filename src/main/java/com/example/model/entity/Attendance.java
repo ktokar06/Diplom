@@ -28,10 +28,4 @@ public class Attendance {
 
     @Column(name = "comment")
     private String comment;
-
-    @Column(name = "special_condition")
-    private String specialCondition;
-
-    @Column(name = "color_code")
-    private String colorCode;
 }
