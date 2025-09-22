@@ -1,6 +1,7 @@
-package com.example.controller;
+package com.example.tests;
 
 import com.example.config.TestSecurityConfig;
+import com.example.controller.AttendanceController;
 import com.example.model.entity.Student;
 import com.example.repository.StudentRepository;
 import com.example.service.AttendanceService;

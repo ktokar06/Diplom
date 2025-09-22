@@ -3,13 +3,8 @@
 <suite name="AllTestsSuite" verbose="1" >
     <test name="ControllerTests">
         <classes>
-            <class name="com.example.controller.AttendanceControllerTest"/>
-        </classes>
-    </test>
-
-    <test name="ServiceTests">
-        <classes>
-            <class name="com.example.service.AttendanceServiceTest"/>
+            <class name="com.example.tests.AttendanceControllerTest"/>
+            <class name="com.example.tests.AttendanceServiceTest"/>
         </classes>
     </test>
 </suite>

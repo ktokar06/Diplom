@@ -1,10 +1,11 @@
-package com.example.service;
+package com.example.tests;
 
 import com.example.model.entity.Attendance;
 import com.example.model.entity.Student;
 import com.example.model.entity.Subject;
 import com.example.repository.AttendanceRepository;
 import com.example.repository.SubjectRepository;
+import com.example.service.AttendanceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
