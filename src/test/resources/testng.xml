@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="AllTestsSuite" verbose="1" >
+    <test name="ControllerTests">
+        <classes>
+            <class name="com.example.controller.AttendanceControllerTest"/>
+        </classes>
+    </test>
+
+    <test name="ServiceTests">
+        <classes>
+            <class name="com.example.service.AttendanceServiceTest"/>
+        </classes>
+    </test>
+</suite>
