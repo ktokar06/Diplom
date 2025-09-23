@@ -14,7 +14,6 @@ public class BaseTest {
 
     @BeforeClass
     public void setUp() {
-        // Параметры подключения к БД PostgreSQL
         String hostname = "localhost";
         String dbname = "CT_MTUCI_DIPLOM_Kutsebo";
         String userName = "postgres";
@@ -23,7 +22,6 @@ public class BaseTest {
         createConnection(hostname, dbname, userName, password);
         createStatement();
 
-        // Инициализируем сервисы с соединением
         initServices();
     }
 
