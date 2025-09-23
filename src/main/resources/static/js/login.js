@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var fullName = student.fullName || '';
                 var ticketNumber = student.studentTicketNumber || '';
                 option.value = ticketNumber;
-                option.textContent = fullName; // Только ФИО, без номера билета
+                option.textContent = fullName;
                 userSelect.appendChild(option);
             });
         } else {
