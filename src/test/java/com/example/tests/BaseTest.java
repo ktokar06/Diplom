@@ -1,5 +1,6 @@
 package com.example.tests;
 
+import com.example.service.StudentServiceInTest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import java.sql.Connection;
@@ -66,7 +67,7 @@ public class BaseTest {
     private void initServices() {
         com.example.service.GroupService.setConnection(connection);
         com.example.service.RoleService.setConnection(connection);
-        com.example.service.StudentService.setConnection(connection);
+        StudentServiceInTest.setConnection(connection);
         com.example.service.TeacherService.setConnection(connection);
     }
 }

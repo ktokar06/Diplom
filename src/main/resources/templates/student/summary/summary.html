@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Общая сводка</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'summary')}"></div>
+
+<div class="main-content" id="mainContent">
+    <div class="container mt-4">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/student/dashboard}">Главная</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Общая сводка</li>
+            </ol>
+        </nav>
+
+        <h1 class="mb-4">Общая сводка по оценкам и посещаемости</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="main-stats-card">
+                        <h5>Средний балл</h5>
+                        <h1 th:text="${#numbers.formatDecimal(summaryData.overallAvgGrade, 1, 2)} ?: '0.0'"></h1>
+                        <div class="progress">
+                            <div class="progress-bar"
+                                 th:style="${summaryData.overallAvgGrade != null and summaryData.overallAvgGrade > 0} ? 'width: ' + (${summaryData.overallAvgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="main-stats-card">
+                        <h5>Общая посещаемость</h5>
+                        <h1 th:text="${#numbers.formatDecimal(summaryData.overallAttendance, 1, 2)} + '%' ?: '0%'"></h1>
+                        <div class="progress">
+                            <div class="progress-bar" th:style="'width: ' + ${summaryData.overallAttendance} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Оценки по предметам</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th class="text-left">Предмет</th>
+                                    <th class="text-center">Средний балл</th>
+                                    <th class="text-center">Мин. оценка</th>
+                                    <th class="text-center">Макс. оценка</th>
+                                    <th class="text-center">Количество оценок</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="entry : ${summaryData.gradesData}">
+                                    <td class="text-left" th:text="${entry.value.subject.name}"></td>
+                                    <td class="text-center number-cell avg-grade" th:text="${entry.value.avgGrade} ?: '—'"></td>
+                                    <td class="text-center number-cell">
+                                        <span th:if="${entry.value.minGrade != null}"
+                                              class="grade-badge"
+                                              th:classappend="${entry.value.minGrade == 5} ? 'grade-excellent' :
+                                                              (${entry.value.minGrade == 4} ? 'grade-good' :
+                                                              (${entry.value.minGrade == 3} ? 'grade-satisfactory' : 'grade-unsatisfactory'))"
+                                              th:text="${entry.value.minGrade}">
+                                        </span>
+                                        <span th:unless="${entry.value.minGrade != null}" class="text-muted">—</span>
+                                    </td>
+                                    <td class="text-center number-cell">
+                                        <span th:if="${entry.value.maxGrade != null}"
+                                              class="grade-badge"
+                                              th:classappend="${entry.value.maxGrade == 5} ? 'grade-excellent' :
+                                                              (${entry.value.maxGrade == 4} ? 'grade-good' :
+                                                              (${entry.value.maxGrade == 3} ? 'grade-satisfactory' : 'grade-unsatisfactory'))"
+                                              th:text="${entry.value.maxGrade}">
+                                        </span>
+                                        <span th:unless="${entry.value.maxGrade != null}" class="text-muted">—</span>
+                                    </td>
+                                    <td class="text-center number-cell" th:text="${entry.value.totalGrades} ?: '0'"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Посещаемость по предметам</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th class="text-left">Предмет</th>
+                                    <th class="text-center">Посещено</th>
+                                    <th class="text-center">Пропущено</th>
+                                    <th class="text-center">Всего</th>
+                                    <th class="text-center">Процент</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="entry : ${summaryData.attendanceData}">
+                                    <td class="text-left" th:text="${entry.value.subject.name}"></td>
+                                    <td class="text-center number-cell text-success fw-bold" th:text="${entry.value.present} ?: '0'"></td>
+                                    <td class="text-center number-cell text-danger fw-bold" th:text="${entry.value.absent} ?: '0'"></td>
+                                    <td class="text-center number-cell fw-bold" th:text="${entry.value.total} ?: '0'"></td>
+                                    <td class="text-center number-cell avg-grade" th:text="${#numbers.formatDecimal(entry.value.present * 100.0 / entry.value.total, 1, 2)} + '%' ?: '0%'"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

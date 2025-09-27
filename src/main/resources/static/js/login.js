@@ -20,10 +20,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateStudentList(students) {
-        userSelect.innerHTML = '<option value="">Выберите студента</option>';
+        userSelect.innerHTML = '<option value="" disabled selected>Выберите студента</option>';
 
         if (students && students.length > 0) {
-            students.forEach(function(student) {
+            const sortedStudents = students.sort(function(a, b) {
+                const nameA = (a.fullName || '').toLowerCase();
+                const nameB = (b.fullName || '').toLowerCase();
+                return nameA.localeCompare(nameB, 'ru');
+            });
+
+            sortedStudents.forEach(function(student) {
                 var option = document.createElement('option');
                 var fullName = student.fullName || '';
                 var ticketNumber = student.studentTicketNumber || '';
@@ -52,5 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 userSelect.innerHTML = '<option value="">Сначала выберите группу</option>';
             }
         });
+
+        if (groupSelect.value) {
+            var groupId = parseInt(groupSelect.value);
+            if (studentsMap && studentsMap[groupId]) {
+                updateStudentList(studentsMap[groupId]);
+            }
+        }
     }
 });

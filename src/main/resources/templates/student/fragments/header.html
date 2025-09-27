@@ -1,47 +1,38 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Header Fragment</title>
+    <title>Header Fragment Student</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div th:fragment="header(fullName, role, activePage)">
 
-    <header class="p-2 mb-3 border-bottom">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start">
+    <header class="header-top">
+        <div class="header-container">
+            <div class="header-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF.svg/1200px-%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF.svg.png" alt="MTUCI Logo" class="login-logo"/>
+            </div>
 
-                <div class="d-flex align-items-center me-3">
-                    <picture>
-                        <source srcset="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg" type="image/svg+xml">
-                        <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg"
-                             alt="MTUCI Logo"
-                             style="height: 55px; width: auto; margin-right: 8px;">
-                    </picture>
-                </div>
-
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="/dashboard" class="nav-link px-2" th:classappend="${activePage == 'dashboard'} ? 'link-secondary' : 'link-body-emphasis'">Главная</a></li>
-                    <li><a href="/attendance" class="nav-link px-2" th:classappend="${activePage == 'attendance'} ? 'link-secondary' : 'link-body-emphasis'">Посещения</a></li>
-                    <li><a href="/grades" class="nav-link px-2" th:classappend="${activePage == 'performance'} ? 'link-secondary' : 'link-body-emphasis'">Успеваемость</a></li>
+            <nav class="header-nav">
+                <ul>
+                    <li><a href="/student/dashboard" th:classappend="${activePage == 'dashboard'} ? 'link-secondary' : ''">Главная</a></li>
+                    <li><a href="/student/attendance" th:classappend="${activePage == 'attendance'} ? 'link-secondary' : ''">Посещения</a></li>
+                    <li><a href="/student/grades" th:classappend="${activePage == 'grades'} ? 'link-secondary' : ''">Успеваемость</a></li>
+                    <li><a href="/student/summary" th:classappend="${activePage == 'summary'} ? 'link-secondary' : ''">Общая сводка</a></li>
                 </ul>
+            </nav>
 
-                <div class="dropdown text-end">
-                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <picture>
-                            <source srcset="https://cdn-icons-png.flaticon.com/512/149/149071.png" type="image/png">
-                            <source srcset="https://cdn-icons-png.flaticon.com/512/149/149071.webp" type="image/webp">
-                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                 alt="Пользователь"
-                                 width="32"
-                                 height="32"
-                                 class="rounded-circle">
-                        </picture>
-                    </a>
-                    <ul class="dropdown-menu text-small">
+            <div class="header-user">
+                <div class="dropdown">
+                    <button class="dropdown-toggle" data-bs-toggle="dropdown">
+                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                             alt="Пользователь"
+                             class="user-avatar">
+                    </button>
+                    <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Изменить пароль</a></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
@@ -50,7 +41,6 @@
                         </li>
                     </ul>
                 </div>
-
             </div>
         </div>
     </header>
@@ -58,7 +48,7 @@
     <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form th:action="@{/change-password}" method="post">
+                <form th:action="@{/student/change-password}" method="post">
                     <div class="modal-header">
                         <h5 class="modal-title" id="changePasswordModalLabel">Изменение пароля</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -76,7 +66,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="submit" class="btn btn-primary btn-save-password">Сохранить</button>
                     </div>
                 </form>
             </div>

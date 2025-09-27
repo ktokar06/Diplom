@@ -4,7 +4,6 @@ import lombok.*;
 import java.io.Serializable;
 
 @Data
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeacherSubjectId implements Serializable {

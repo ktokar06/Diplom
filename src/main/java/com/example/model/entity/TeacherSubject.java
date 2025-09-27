@@ -3,9 +3,9 @@ package com.example.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "teacher_subject")
-@Data
 public class TeacherSubject {
     @EmbeddedId
     private TeacherSubjectId id;

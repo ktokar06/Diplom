@@ -21,6 +21,11 @@ public class LoginController {
     private final GroupRepository groupRepository;
     private final StudentRepository studentRepository;
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/student/dashboard";
+    }
+
     @GetMapping("/login")
     public String loginPage(Model model,
                             @RequestParam(value = "error", required = false) String error,
@@ -37,10 +42,10 @@ public class LoginController {
         model.addAttribute("groups", groups);
         model.addAttribute("studentsMap", studentsMap);
 
-        if (error != null) {
+        if ("true".equals(error)) {
             model.addAttribute("errorMessage", "Неверные учетные данные");
         }
-        if (logout != null) {
+        if ("true".equals(logout)) {
             model.addAttribute("message", "Вы успешно вышли из системы");
         }
 
