@@ -56,6 +56,10 @@ public class StudentAttendanceController {
             return "redirect:/student/attendance";
         }
 
+        Set<Long> subjectIds = Collections.singleton(subjectId);
+        Map<Long, String> teacherNames = studentService.buildTeacherNames(subjectIds);
+        model.addAttribute("teacherNames", teacherNames);
+
         model.addAllAttributes(details);
         return "student/attendance/attendance-detail";
     }
