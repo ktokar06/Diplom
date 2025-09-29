@@ -1,14 +1,19 @@
 package com.example.service;
 
-import com.example.model.entity.*;
+import com.example.model.AcademicPerformance;
+import com.example.model.Subject;
+import com.example.model.Teacher;
+import com.example.model.TeacherSubject;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.*;
 
 /**
- * Сервис для работы с оценками студентов.
+ * Сервис для управления оценками студентов.
+ * Предоставляет функциональность для получения и анализа данных об успеваемости.
  */
 @Service
 @RequiredArgsConstructor
@@ -21,30 +26,69 @@ public class GradeService {
     /**
      * Веса типов работ для расчёта среднего балла.
      */
-    private static final Map<String, Double> WORK_TYPE_WEIGHTS = Map.of(
-            "Экзамен", 3.0,
-            "Контрольная работа", 2.0,
-            "Урок", 1.0,
-            "Домашнее задание", 1.0
-    );
+    private static final Map<String, Double> WORK_TYPE_WEIGHTS = new HashMap<>();
+
+    static {
+        WORK_TYPE_WEIGHTS.put("Экзамен", 3.0);
+        WORK_TYPE_WEIGHTS.put("Контрольная работа", 2.0);
+        WORK_TYPE_WEIGHTS.put("Урок", 1.0);
+        WORK_TYPE_WEIGHTS.put("Домашнее задание", 1.0);
+    }
 
     /**
-     * Формирует панель оценок студента по предметам.
+     * Формирует панель оценок студента по всем предметам.
+     * Группирует оценки по предметам и вычисляет статистические показатели.
      *
-     * @param studentId ID студента.
-     * @return карта с данными оценок по предметам.
+     * @param studentId идентификатор студента
+     * @return где ключ - ID предмета, значение - данные:
+     *         - "subject": объект предмета
+     *         - "totalGrades": общее количество оценок
+     *         - "avgGrade": средний балл с учётом весов
+     *         - "maxGrade": максимальная оценка
+     *         - "minGrade": минимальная оценка
+     *         - "grades": список всех оценок по предмету
+     * @throws IllegalArgumentException если studentId равен null
      */
     public Map<Long, Map<String, Object>> getGradesDashboard(Long studentId) {
         List<AcademicPerformance> performances = academicPerformanceRepository.findByStudentId(studentId);
+        Map<Long, List<AcademicPerformance>> groupedBySubject = groupPerformancesBySubject(performances);
+
+        return buildDashboardData(groupedBySubject);
+    }
+
+    /**
+     * Группирует оценки по предметам.
+     *
+     * @param performances список оценок студента
+     * @return группированные оценки по ID предметов
+     */
+    private Map<Long, List<AcademicPerformance>> groupPerformancesBySubject(List<AcademicPerformance> performances) {
         Map<Long, List<AcademicPerformance>> groupedBySubject = new HashMap<>();
 
         for (AcademicPerformance grade : performances) {
-            if (grade.getSubject() == null) continue;
-            Long subjectId = grade.getSubject().getSubjectId();
-            groupedBySubject.computeIfAbsent(subjectId, k -> new ArrayList<>()).add(grade);
+            if (grade.getSubject() != null) {
+                Long subjectId = grade.getSubject().getSubjectId();
+                List<AcademicPerformance> subjectGrades = groupedBySubject.get(subjectId);
+                if (subjectGrades == null) {
+                    subjectGrades = new ArrayList<>();
+                    groupedBySubject.put(subjectId, subjectGrades);
+                }
+                subjectGrades.add(grade);
+            }
         }
 
+        return groupedBySubject;
+    }
+
+    /**
+     * Строит данные для панели оценок на основе сгруппированных оценок.
+     *
+     * @param groupedBySubject оценки сгруппированных по предметам
+     * @return данные для панели оценок
+     */
+    private Map<Long, Map<String, Object>> buildDashboardData(Map<Long, List<AcademicPerformance>> groupedBySubject) {
         Map<Long, Map<String, Object>> dashboard = new HashMap<>();
+
         for (Map.Entry<Long, List<AcademicPerformance>> entry : groupedBySubject.entrySet()) {
             Long subjectId = entry.getKey();
             Optional<Subject> subjectOpt = subjectRepository.findById(subjectId);
@@ -53,14 +97,7 @@ public class GradeService {
                 Subject subject = subjectOpt.get();
                 List<AcademicPerformance> grades = entry.getValue();
 
-                Map<String, Object> subjectData = new HashMap<>();
-                subjectData.put("subject", subject);
-                subjectData.put("totalGrades", grades.size());
-                subjectData.put("avgGrade", calculateAverageGrade(grades));
-                subjectData.put("maxGrade", calculateMaxGrade(grades));
-                subjectData.put("minGrade", calculateMinGrade(grades));
-                subjectData.put("grades", grades);
-
+                Map<String, Object> subjectData = createSubjectData(subject, grades);
                 dashboard.put(subjectId, subjectData);
             }
         }
@@ -69,11 +106,39 @@ public class GradeService {
     }
 
     /**
-     * Получает детали по конкретному предмету для студента.
+     * Создает данные по предмету для панели оценок.
      *
-     * @param subjectId ID предмета.
-     * @param studentId ID студента.
-     * @return данные по оценкам по предмету.
+     * @param subject объект предмета
+     * @param grades список оценок по предмету
+     * @return данные по предмету
+     */
+    private Map<String, Object> createSubjectData(Subject subject, List<AcademicPerformance> grades) {
+        Map<String, Object> subjectData = new HashMap<>();
+        subjectData.put("subject", subject);
+        subjectData.put("totalGrades", grades.size());
+        subjectData.put("avgGrade", calculateAverageGrade(grades));
+        subjectData.put("maxGrade", calculateMaxGrade(grades));
+        subjectData.put("minGrade", calculateMinGrade(grades));
+        subjectData.put("grades", grades);
+
+        return subjectData;
+    }
+
+    /**
+     * Получает детализированную информацию по конкретному предмету для студента.
+     * Включает статистику и распределение оценок.
+     *
+     * @param subjectId идентификатор предмета
+     * @param studentId идентификатор студента
+     * @return детализированные данными по предмету или null если предмет не найден:
+     *         - "subject": объект предмета
+     *         - "grades": список всех оценок
+     *         - "avgGrade": средний балл
+     *         - "maxGrade": максимальная оценка
+     *         - "minGrade": минимальная оценка
+     *         - "lastGrade": последняя полученная оценка
+     *         - "gradeCounts": распределение оценок по значениям
+     *         - "totalGrades": общее количество оценок
      */
     public Map<String, Object> getSubjectDetails(Long subjectId, Long studentId) {
         Optional<Subject> subjectOpt = subjectRepository.findById(subjectId);
@@ -87,9 +152,20 @@ public class GradeService {
                 .findByStudentIdAndSubjectSubjectId(studentId, subjectId);
 
         if (grades == null) {
-            grades = new ArrayList<>();
+            grades = Collections.emptyList();
         }
 
+        return createSubjectDetails(subject, grades);
+    }
+
+    /**
+     * Создает детализированные данные по предмету.
+     *
+     * @param subject объект предмета
+     * @param grades список оценок по предмету
+     * @return детализированные данными
+     */
+    private Map<String, Object> createSubjectDetails(Subject subject, List<AcademicPerformance> grades) {
         Map<String, Object> result = new HashMap<>();
         result.put("subject", subject);
         result.put("grades", grades);
@@ -104,7 +180,11 @@ public class GradeService {
     }
 
     /**
-     * Вычисляет среднюю оценку с учётом веса типов работ.
+     * Вычисляет средневзвешенную оценку с учётом типов работ.
+     * Использует веса из WORK_TYPE_WEIGHTS для расчета.
+     *
+     * @param grades список оценок для расчета
+     * @return средневзвешенный балл, округленный до 2 знаков после запятой, или null если оценки отсутствуют
      */
     private Double calculateAverageGrade(List<AcademicPerformance> grades) {
         if (grades == null || grades.isEmpty()) {
@@ -116,7 +196,10 @@ public class GradeService {
 
         for (AcademicPerformance grade : grades) {
             if (grade.getGrade() != null) {
-                Double weight = WORK_TYPE_WEIGHTS.getOrDefault(grade.getWorkType(), 1.0);
+                Double weight = WORK_TYPE_WEIGHTS.get(grade.getWorkType());
+                if (weight == null) {
+                    weight = 1.0;
+                }
                 weightedSum += grade.getGrade() * weight;
                 totalWeight += weight;
             }
@@ -131,60 +214,70 @@ public class GradeService {
     }
 
     /**
-     * Находит максимальную оценку.
+     * Находит максимальную оценку из списка.
+     *
+     * @param grades список оценок
+     * @return максимальная оценка или 0 если оценки отсутствуют
      */
     private Integer calculateMaxGrade(List<AcademicPerformance> grades) {
-        int max = 0;
-
-        for (AcademicPerformance grade : grades) {
-            if (grade.getGrade() != null && grade.getGrade() > max) {
-                max = grade.getGrade();
-            }
-        }
-
-        return max;
-    }
-
-    /**
-     * Находит минимальную оценку.
-     */
-    private Integer calculateMinGrade(List<AcademicPerformance> grades) {
-        if (grades == null || grades.isEmpty()) {
-            return 0;
-        }
-
-        Integer min = null;
+        Integer maxGrade = null;
 
         for (AcademicPerformance grade : grades) {
             if (grade.getGrade() != null) {
-                if (min == null || grade.getGrade() < min) {
-                    min = grade.getGrade();
+                if (maxGrade == null || grade.getGrade() > maxGrade) {
+                    maxGrade = grade.getGrade();
                 }
             }
         }
 
-        return min == null ? 0 : min;
+        return maxGrade != null ? maxGrade : 0;
     }
 
     /**
-     * Находит последнюю оценку по дате.
+     * Находит минимальную оценку из списка.
+     *
+     * @param grades список оценок
+     * @return минимальная оценка или 0 если оценки отсутствуют
+     */
+    private Integer calculateMinGrade(List<AcademicPerformance> grades) {
+        Integer minGrade = null;
+
+        for (AcademicPerformance grade : grades) {
+            if (grade.getGrade() != null) {
+                if (minGrade == null || grade.getGrade() < minGrade) {
+                    minGrade = grade.getGrade();
+                }
+            }
+        }
+
+        return minGrade != null ? minGrade : 0;
+    }
+
+    /**
+     * Находит последнюю оценку по дате получения.
+     *
+     * @param grades список оценок
+     * @return последняя оценка или null если оценки отсутствуют
      */
     private Integer getLastGrade(List<AcademicPerformance> grades) {
-        AcademicPerformance latest = null;
+        AcademicPerformance lastGrade = null;
 
         for (AcademicPerformance grade : grades) {
             if (grade.getGrade() != null && grade.getAssessmentDate() != null) {
-                if (latest == null || grade.getAssessmentDate().isAfter(latest.getAssessmentDate())) {
-                    latest = grade;
+                if (lastGrade == null || grade.getAssessmentDate().isAfter(lastGrade.getAssessmentDate())) {
+                    lastGrade = grade;
                 }
             }
         }
 
-        return latest != null ? latest.getGrade() : null;
+        return lastGrade != null ? lastGrade.getGrade() : null;
     }
 
     /**
-     * Подсчитывает количество оценок по значениям (1-5).
+     * Подсчитывает количество оценок по значениям от 1 до 5.
+     *
+     * @param grades список оценок
+     * @return объект с количеством оценок для каждого значения
      */
     private Map<Integer, Integer> countGradesByValue(List<AcademicPerformance> grades) {
         Map<Integer, Integer> counts = new HashMap<>();
@@ -195,8 +288,9 @@ public class GradeService {
 
         if (grades != null) {
             for (AcademicPerformance grade : grades) {
-                if (grade.getGrade() != null && grade.getGrade() >= 1 && grade.getGrade() <= 5) {
-                    counts.put(grade.getGrade(), counts.get(grade.getGrade()) + 1);
+                if (grade.getGrade() != null && grade.getGrade() >= 2 && grade.getGrade() <= 5) {
+                    Integer currentCount = counts.get(grade.getGrade());
+                    counts.put(grade.getGrade(), currentCount + 1);
                 }
             }
         }
@@ -205,7 +299,11 @@ public class GradeService {
     }
 
     /**
-     * Получает список имён преподавателей по ID предмета.
+     * Получает список преподавателей, ведущих указанный предмет.
+     *
+     * @param subjectId идентификатор предмета
+     * @return список имен преподавателей или пустой список если преподаватели не найдены
+     * @throws IllegalArgumentException если subjectId равен null
      */
     public List<String> getTeacherNamesBySubjectId(Long subjectId) {
         List<TeacherSubject> teacherSubjects = teacherSubjectRepository.findBySubjectSubjectId(subjectId);
@@ -219,5 +317,84 @@ public class GradeService {
         }
 
         return teacherNames;
+    }
+
+    /**
+     * Форматирует список преподавателей в строку.
+     *
+     * @param teachers список имен преподавателей
+     * @return отформатированная строка с именами преподавателей
+     */
+    public String buildTeacherNameString(List<String> teachers) {
+        if (teachers == null || teachers.isEmpty()) {
+            return "Не назначен";
+        }
+        return String.join(", ", teachers);
+    }
+
+    /**
+     * Добавляет детализированные данные оценок в модель для отображения.
+     * Включает основную информацию о предмете, оценки и статистику.
+     *
+     * @param model объект модели для добавления атрибутов
+     * @param details детализированные данные по предмету
+     * @param subjectId идентификатор предмета
+     */
+    public void addGradeDetailsToModel(Model model, Map<String, Object> details, Long subjectId) {
+        model.addAttribute("subject", details.get("subject"));
+        model.addAttribute("grades", details.get("grades"));
+        model.addAttribute("avgGrade", details.get("avgGrade"));
+        model.addAttribute("maxGrade", details.get("maxGrade"));
+        model.addAttribute("minGrade", details.get("minGrade"));
+        model.addAttribute("lastGrade", details.get("lastGrade"));
+
+        Object subjectObj = details.get("subject");
+        if (subjectObj instanceof Subject) {
+            Subject subject = (Subject) subjectObj;
+            List<String> teachers = getTeacherNamesBySubjectId(subject.getSubjectId());
+            model.addAttribute("teacherName", buildTeacherNameString(teachers));
+        } else {
+            model.addAttribute("teacherName", "Не назначен");
+        }
+
+        addGradeStatistics(model, details);
+    }
+
+    /**
+     * Добавляет статистику оценок в модель.
+     * Рассчитывает количество оценок по категориям: отлично, хорошо, удовлетворительно, неудовлетворительно.
+     *
+     * @param model объект модели для добавления атрибутов
+     * @param details детализированные данные по предмету
+     */
+    private void addGradeStatistics(Model model, Map<String, Object> details) {
+        List<AcademicPerformance> gradeList = (List<AcademicPerformance>) details.get("grades");
+
+        long excellentCount = 0;
+        long goodCount = 0;
+        long satisfactoryCount = 0;
+        long unsatisfactoryCount = 0;
+
+        if (gradeList != null) {
+            for (AcademicPerformance grade : gradeList) {
+                if (grade.getGrade() != null) {
+                    Double gradeValue = Double.valueOf(grade.getGrade());
+                    if (gradeValue >= 4.5) {
+                        excellentCount++;
+                    } else if (gradeValue >= 3.5) {
+                        goodCount++;
+                    } else if (gradeValue >= 2.5) {
+                        satisfactoryCount++;
+                    } else {
+                        unsatisfactoryCount++;
+                    }
+                }
+            }
+        }
+
+        model.addAttribute("excellentCount", excellentCount);
+        model.addAttribute("goodCount", goodCount);
+        model.addAttribute("satisfactoryCount", satisfactoryCount);
+        model.addAttribute("unsatisfactoryCount", unsatisfactoryCount);
     }
 }

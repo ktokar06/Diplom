@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.example.service.StudentService.*;
+import static com.example.service.StudentServiceInTest.*;
 
 public class StudentTest extends BaseTest {
 

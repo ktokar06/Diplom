@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Montserrat:wght@400;500;600;700" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                primary: '#372579',
+                'background-light': '#f5f7f8',
+                'background-dark': '#101722',
+              },
+              fontFamily: {
+                display: ['Montserrat'],
+              },
+              borderRadius: {
+                DEFAULT: '0.25rem',
+                lg: '0.5rem',
+                xl: '0.75rem',
+                full: '9999px',
+              },
+              fontSize: {
+                'base': '16px',
+              }
+            },
+          },
+        };
+    </script>
+    <title>Общая сводка - Система отслеживания</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-base text-black">
+<div class="flex flex-col min-h-screen">
+    <div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'summary')}"></div>
+
+    <main class="flex-1">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col gap-8">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a th:href="@{/student/dashboard}" class="inline-flex items-center text-sm font-medium text-black hover:text-primary">
+                                Главная
+                            </a>
+                        </li>
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 text-black mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                </svg>
+                                <span class="ml-1 text-sm font-medium text-black">Общая сводка</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Общая сводка по оценкам и посещаемости</h1>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4">Средний балл</h3>
+                        <div class="flex flex-col items-center justify-center bg-background-light dark:bg-background-dark rounded-lg p-4">
+                            <p class="text-3xl font-bold text-primary" th:text="${#numbers.formatDecimal(summaryData.overallAvgGrade, 1, 2)} ?: '0.0'"></p>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm font-medium mb-1">
+                                    <span class="text-black">Средний балл</span>
+                                    <span class="text-black" th:text="${#numbers.formatDecimal(summaryData.overallAvgGrade, 1, 2)} ?: '0.0'"></span>
+                                </div>
+                                <div class="w-full bg-background-light dark:bg-background-dark rounded-full h-2.5">
+                                    <div class="bg-primary h-2.5 rounded-full"
+                                         th:style="${summaryData.overallAvgGrade != null and summaryData.overallAvgGrade > 0} ? 'width: ' + (${summaryData.overallAvgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4">Общая посещаемость</h3>
+                        <div class="flex flex-col items-center justify-center bg-background-light dark:bg-background-dark rounded-lg p-4">
+                            <p class="text-3xl font-bold text-primary" th:text="${#numbers.formatDecimal(summaryData.overallAttendance, 1, 2)} + '%' ?: '0%'"></p>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm font-medium mb-1">
+                                    <span class="text-black">Посещаемость</span>
+                                    <span class="text-black" th:text="${#numbers.formatDecimal(summaryData.overallAttendance, 1, 2)} + '%' ?: '0%'"></span>
+                                </div>
+                                <div class="w-full bg-background-light dark:bg-background-dark rounded-full h-2.5">
+                                    <div class="bg-primary h-2.5 rounded-full" th:style="'width: ' + ${summaryData.overallAttendance} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Оценки по предметам</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-black uppercase bg-background-light dark:bg-background-dark">
+                            <tr>
+                                <th class="px-4 py-3" scope="col">Предмет</th>
+                                <th class="px-4 py-3 text-center" scope="col">Средний балл</th>
+                                <th class="px-4 py-3 text-center" scope="col">Мин. оценка</th>
+                                <th class="px-4 py-3 text-center" scope="col">Макс. оценка</th>
+                                <th class="px-4 py-3 text-center" scope="col">Количество оценок</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry : ${summaryData.gradesData}" class="border-b border-background-light dark:border-background-dark">
+                                <td class="px-4 py-3 font-medium" th:text="${entry.value.subject.name}"></td>
+                                <td class="px-4 py-3 text-center text-black" th:text="${entry.value.avgGrade} ?: '—'"></td>
+                                <td class="px-4 py-3 text-center">
+                                        <span th:if="${entry.value.minGrade != null}"
+                                              class="inline-flex items-center justify-center w-7 h-7 rounded-full font-medium text-white"
+                                              th:classappend="${entry.value.minGrade == 5} ? 'bg-green-500' :
+                                                              (${entry.value.minGrade == 4} ? 'bg-green-700' :
+                                                              (${entry.value.minGrade == 3} ? 'bg-yellow-500' : 'bg-red-500'))"
+                                              th:text="${entry.value.minGrade}">
+                                        </span>
+                                    <span th:unless="${entry.value.minGrade != null}" class="text-black">—</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                        <span th:if="${entry.value.maxGrade != null}"
+                                              class="inline-flex items-center justify-center w-7 h-7 rounded-full font-medium text-white"
+                                              th:classappend="${entry.value.maxGrade == 5} ? 'bg-green-500' :
+                                                              (${entry.value.maxGrade == 4} ? 'bg-green-700' :
+                                                              (${entry.value.maxGrade == 3} ? 'bg-yellow-500' : 'bg-red-500'))"
+                                              th:text="${entry.value.maxGrade}">
+                                        </span>
+                                    <span th:unless="${entry.value.maxGrade != null}" class="text-black">—</span>
+                                </td>
+                                <td class="px-4 py-3 text-center text-black" th:text="${entry.value.totalGrades} ?: '0'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Посещаемость по предметам</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-black uppercase bg-background-light dark:bg-background-dark">
+                            <tr>
+                                <th class="px-4 py-3" scope="col">Предмет</th>
+                                <th class="px-4 py-3 text-center" scope="col">Посещено</th>
+                                <th class="px-4 py-3 text-center" scope="col">Пропущено</th>
+                                <th class="px-4 py-3 text-center" scope="col">Всего</th>
+                                <th class="px-4 py-3 text-center" scope="col">Процент</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry : ${summaryData.attendanceData}" class="border-b border-background-light dark:border-background-dark">
+                                <td class="px-4 py-3 font-medium" th:text="${entry.value.subject.name}"></td>
+                                <td class="px-4 py-3 text-center text-green-600 dark:text-green-500 font-semibold" th:text="${entry.value.present} ?: '0'"></td>
+                                <td class="px-4 py-3 text-center text-red-600 dark:text-red-500 font-semibold" th:text="${entry.value.absent} ?: '0'"></td>
+                                <td class="px-4 py-3 text-center text-black font-semibold" th:text="${entry.value.total} ?: '0'"></td>
+                                <td class="px-4 py-3 text-center font-semibold"
+                                    th:classappend="${entry.value.present * 100.0 / entry.value.total >= 90} ? 'text-green-600 dark:text-green-500' :
+                                                        (${entry.value.present * 100.0 / entry.value.total >= 80} ? 'text-orange-500' : 'text-red-600 dark:text-red-500')"
+                                    th:text="${#numbers.formatDecimal(entry.value.present * 100.0 / entry.value.total, 1, 2)} + '%' ?: '0%'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/header.js"></script>
+</body>
+</html>

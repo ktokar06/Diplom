@@ -1,27 +1,78 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Вход для студентов</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Студенческий портал - Вход</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#372579",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#131022",
+                    },
+                    fontFamily: {
+                        "display": ["Montserrat"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontSize: {
+                        'base': '16px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .password-toggle-icon {
+            display: none;
+            cursor: pointer;
+        }
+
+        #password:not(:placeholder-shown) ~ #togglePassword .password-toggle-icon,
+        #password[type="text"] ~ #togglePassword .password-toggle-icon {
+            display: block;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+    </style>
 </head>
-<body class="login-body">
+<body class="bg-background-light dark:bg-background-dark font-display flex items-center justify-center p-4">
+<div class="w-full max-w-6xl">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex">
+        <div class="w-2/5 relative">
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCoSV7cPc0aQwJLfE7W9_1GZmfHvh8eNEn_JqG95yVCXXrxrR9ati76AKJFyACBmI2HcCk8y5AljS8Dn__gK4Jo-eJ1hZ7Tt-jRZSWD8ZI2mO35fFDnTRdCzTgAxPhzJP16WPRPpHe4J1TqGGb1wlXHoZ1aAP8lb7bGiXXV3ftZVlmZw_li61osYY4HEGhS5PjynwOTtXdNMMRiLzQjDUAm82XXkyfa_BzFlUe7z7SJaArkviF5zDAzYoABR47OUkTranUZhRyxGeQ');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-gray-800 to-transparent"></div>
+            <div class="absolute bottom-8 left-8">
+                <img src="https://static.tildacdn.com/tild3361-3034-4366-a436-356337633765/photo.svg" alt="MTUCI Logo" class="login-logo"/>
+            </div>
+        </div>
 
-<div class="login-container">
-    <div class="card login-card">
-        <div class="card-body">
-
-            <div class="text-center mb-4">
-                <img src="https://lk.mtuci.ru/bvzauth/resources/s6zge/login/mtuci/img/mtuci_logo.svg" alt="MTUCI Logo" class="login-logo"/>
+        <div class="w-3/5 px-16 py-20">
+            <div class="pb-12">
+                <h1 class="text-5xl font-bold text-gray-900 dark:text-white tracking-tight">С возвращением</h1>
+                <p class="text-gray-500 dark:text-gray-400 mt-4 text-2xl">Войдите в студенческий портал</p>
             </div>
 
-            <form id="loginForm" method="post" th:action="@{/login}" class="login-form">
-                <div class="mb-3">
-                    <label for="group" class="form-label">Группа</label>
-                    <select id="group" name="group" class="form-select" required>
-                        <option value="">Выберите группу</option>
+            <form class="space-y-10" id="loginForm" method="post" th:action="@{/login}">
+                <div class="space-y-4">
+                    <label class="block text-xl font-medium text-gray-700 dark:text-gray-300" for="group">Выберите группу</label>
+                    <select class="form-select w-full rounded-xl border-none bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-20 pl-6 pr-14 text-xl" id="group" name="group" required>
+                        <option value="" disabled selected>Выберите группу</option>
                         <option th:each="group : ${groups}"
                                 th:value="${group.id}"
                                 th:text="${group.name} + ' - ' + ${group.specialityCode}">
@@ -29,29 +80,31 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="username" class="form-label">Студент</label>
-                    <select id="username" name="username" class="form-select" required>
-                        <option value="">Сначала выберите группу</option>
+                <div class="space-y-4">
+                    <label class="block text-xl font-medium text-gray-700 dark:text-gray-300" for="username">Выберите студента</label>
+                    <select class="form-select w-full rounded-xl border-none bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-20 pl-6 pr-14 text-xl" id="username" name="username" required>
+                        <option value="" disabled selected>Выберите имя</option>
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Пароль</label>
-                    <div class="password-container">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль" required/>
-                        <button type="button" class="toggle-password" id="togglePassword">
-                            <i class="far fa-eye"></i>
+                <div class="space-y-4">
+                    <label class="block text-xl font-medium text-gray-700 dark:text-gray-300" for="password">Пароль</label>
+                    <div class="relative">
+                        <input autocomplete="current-password" class="form-input w-full rounded-xl border-none bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-20 pl-6 pr-16 text-xl placeholder-gray-400 dark:placeholder-gray-500" id="password" name="password" placeholder="Введите ваш пароль" required="" type="password"/>
+                        <button class="absolute inset-y-0 right-0 flex items-center pr-6 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" type="button" id="togglePassword">
+                            <span class="material-symbols-outlined password-toggle-icon text-3xl" id="passwordIcon">visibility_off</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn login-btn">Войти</button>
+                <div class="flex justify-center items-center pt-6">
+                    <button class="flex justify-center py-6 px-20 border border-transparent rounded-xl shadow-sm text-2xl font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary w-full max-w-md" type="submit">
+                        Войти
+                    </button>
                 </div>
 
-                <div th:if="${errorMessage}" class="alert alert-danger mt-3" th:text="${errorMessage}">Ошибка входа</div>
-                <div th:if="${message}" class="alert alert-success mt-3" th:text="${message}">Сообщение</div>
+                <div th:if="${errorMessage}" class="alert alert-danger mt-8 text-red-500 text-center text-xl" th:text="${errorMessage}">Ошибка входа</div>
+                <div th:if="${message}" class="alert alert-success mt-8 text-green-500 text-center text-xl" th:text="${message}">Сообщение</div>
             </form>
         </div>
     </div>
@@ -62,9 +115,6 @@
     var studentsMap = /*[[${studentsMap}]]*/ {};
     /*]]>*/
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/login.js"></script>
-
 </body>
 </html>
