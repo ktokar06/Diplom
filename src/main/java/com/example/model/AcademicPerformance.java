@@ -1,4 +1,4 @@
-package com.example.model.entity;
+package com.example.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -6,11 +6,11 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "attendance")
-public class Attendance {
+@Table(name = "academic_performance")
+public class AcademicPerformance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long attendanceId;
+    private Long performanceId;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
@@ -20,11 +20,14 @@ public class Attendance {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    @Column(name = "attendance_date")
-    private LocalDate attendanceDate;
+    @Column(name = "grade")
+    private Integer grade;
 
-    @Column(name = "is_present")
-    private Boolean isPresent;
+    @Column(name = "assessment_date")
+    private LocalDate assessmentDate;
+
+    @Column(name = "work_type")
+    private String workType;
 
     @Column(name = "comment")
     private String comment;

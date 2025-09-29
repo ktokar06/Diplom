@@ -1,6 +1,6 @@
 package com.example.repository;
 
-import com.example.model.entity.Teacher;
+import com.example.model.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

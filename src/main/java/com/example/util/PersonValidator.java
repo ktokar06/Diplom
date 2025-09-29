@@ -1,6 +1,6 @@
 package com.example.util;
 
-import com.example.model.entity.Student;
+import com.example.model.Student;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,13 +32,13 @@ public class PersonValidator {
 
     /**
      * Проверяет валидность пароля по длине.
-     * Минимальная допустимая длина пароля - 4 символа.
+     * Минимальная допустимая длина пароля - 2 символа.
      *
      * @param password пароль для проверки
-     * @return true если пароль не null и его длина >= 4 символов, иначе false
+     * @return true если пароль не null и его длина >= 2 символов, иначе false
      */
     public boolean validatePassword(String password) {
-        return password != null && password.length() >= 4;
+        return password != null && password.length() >= 2;
     }
 
     /**

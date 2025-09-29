@@ -55,27 +55,26 @@
 </head>
 <body class="font-display bg-background-light dark:bg-background-dark text-base text-black">
 <div class="flex flex-col min-h-screen">
-
     <div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'grades')}"></div>
 
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="mb-6">
-            <nav class="flex" aria-label="Навигационная цепочка">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a th:href="@{/student/dashboard}" class="inline-flex items-center text-sm font-medium text-black hover:text-primary">
-                            Главная
-                        </a>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <span class="mx-2 text-black">/</span>
-                            <span class="ml-1 text-sm font-medium text-black">Оценки</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
-        </div>
+        <nav aria-label="breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a th:href="@{/student/dashboard}" class="inline-flex items-center text-sm font-medium text-black hover:text-primary">
+                        Главная
+                    </a>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <svg class="w-3 h-3 text-black mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                        </svg>
+                        <span class="ml-1 text-sm font-medium text-black">Оценки</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
 
         <div class="mb-8">
             <h2 class="text-3xl font-bold tracking-tight">Оценки</h2>
@@ -125,6 +124,5 @@
 </div>
 
 <script src="/js/header.js"></script>
-
 </body>
 </html>

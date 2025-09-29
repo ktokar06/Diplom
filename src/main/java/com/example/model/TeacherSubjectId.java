@@ -1,4 +1,4 @@
-package com.example.model.entity;
+package com.example.model;
 
 import lombok.*;
 import java.io.Serializable;

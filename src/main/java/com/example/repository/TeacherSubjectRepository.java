@@ -1,7 +1,7 @@
 package com.example.repository;
 
-import com.example.model.entity.TeacherSubject;
-import com.example.model.entity.TeacherSubjectId;
+import com.example.model.TeacherSubject;
+import com.example.model.TeacherSubjectId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

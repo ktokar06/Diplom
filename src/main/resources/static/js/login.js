@@ -3,20 +3,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const userSelect = document.getElementById('username');
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
+    const passwordIcon = document.getElementById('passwordIcon');
 
-    if (togglePassword && passwordInput) {
+    if (togglePassword && passwordInput && passwordIcon) {
         togglePassword.addEventListener('click', function () {
-            const icon = this.querySelector('i');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                passwordIcon.textContent = 'visibility';
             } else {
                 passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                passwordIcon.textContent = 'visibility_off';
             }
         });
+
+        passwordIcon.style.display = 'block';
     }
 
     function updateStudentList(students) {

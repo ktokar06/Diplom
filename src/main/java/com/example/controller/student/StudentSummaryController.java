@@ -1,6 +1,6 @@
 package com.example.controller.student;
 
-import com.example.model.entity.Student;
+import com.example.model.Student;
 import com.example.security.PersonDetails;
 import com.example.service.StudentService;
 import com.example.service.SummaryService;

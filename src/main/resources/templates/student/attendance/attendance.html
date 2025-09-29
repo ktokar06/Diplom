@@ -43,14 +43,24 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-base text-black">
 <div class="flex flex-col min-h-screen">
-
   <div th:replace="~{student/fragments/header :: header (${fullName}, ${role}, 'attendance')}"></div>
 
   <main class="flex-grow w-full max-w-6xl px-4 py-8 mx-auto sm:px-6 lg:px-8">
-    <nav class="mb-6 text-sm text-black">
-      <ol class="flex space-x-2">
-        <li><a th:href="@{/student/dashboard}" class="hover:text-primary">Главная</a></li>
-        <li class="before:content-['/'] before:mx-2"><span class="text-black">Посещаемость</span></li>
+    <nav aria-label="breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a th:href="@{/student/dashboard}" class="inline-flex items-center text-sm font-medium text-black hover:text-primary">
+            Главная
+          </a>
+        </li>
+        <li aria-current="page">
+          <div class="flex items-center">
+            <svg class="w-3 h-3 text-black mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-black">Посещаемость</span>
+          </div>
+        </li>
       </ol>
     </nav>
 
@@ -99,6 +109,5 @@
 </div>
 
 <script src="/js/header.js"></script>
-
 </body>
 </html>

@@ -1,7 +1,8 @@
 package com.example.controller.student;
 
-import com.example.model.entity.Student;
+import com.example.model.Student;
 import com.example.security.PersonDetails;
+import com.example.service.StudentService;
 import com.example.util.PersonValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,8 +20,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @PreAuthorize("hasRole('STUDENT')")
 public class StudentChangePasswordController {
 
-    private final PersonValidator personValidator;
     private final PasswordEncoder passwordEncoder;
+    private final StudentService studentService;
+    private final PersonValidator personValidator;
 
     @PostMapping("/change-password")
     public String changePassword(
@@ -29,25 +31,30 @@ public class StudentChangePasswordController {
             @AuthenticationPrincipal PersonDetails personDetails,
             RedirectAttributes redirectAttributes) {
 
-        if (personDetails == null || personDetails.student() == null ||
-                personValidator.validateStudent(personDetails.student())) {
+        if (personDetails == null || personDetails.student() == null) {
             return "redirect:/login";
         }
 
-        if (!personValidator.validatePasswordsMatch(newPassword, confirmPassword)) {
-            redirectAttributes.addAttribute("error", "passwordMismatch");
-            return "redirect:/student/dashboard";
-        }
-
         if (!personValidator.validatePassword(newPassword)) {
-            redirectAttributes.addAttribute("error", "passwordTooShort");
+            redirectAttributes.addFlashAttribute("errorMessage", "Пароль должен быть не менее 2 символов!");
             return "redirect:/student/dashboard";
         }
 
-        Student student = personDetails.student();
-        student.setPasswordHash(passwordEncoder.encode(newPassword));
+        if (!personValidator.validatePasswordsMatch(newPassword, confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Пароли не совпадают!");
+            return "redirect:/student/dashboard";
+        }
 
-        redirectAttributes.addAttribute("success", "passwordChanged");
+        try {
+            Student student = personDetails.student();
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            studentService.updatePassword(student.getId(), encodedPassword);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Пароль успешно изменён!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при изменении пароля: " + e.getMessage());
+        }
+
         return "redirect:/student/dashboard";
     }
 }

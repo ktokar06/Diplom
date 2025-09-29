@@ -1,8 +1,7 @@
 package com.example.controller.student;
 
-import com.example.model.entity.Student;
+import com.example.model.Student;
 import com.example.security.PersonDetails;
-import com.example.service.GradeDetailService;
 import com.example.service.GradeService;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class StudentGradeController {
 
     private final GradeService gradeService;
     private final StudentService studentService;
-    private final GradeDetailService gradeDetailService;
 
     @GetMapping("/grades")
     public String grades(Model model, @AuthenticationPrincipal PersonDetails personDetails) {
@@ -58,7 +56,7 @@ public class StudentGradeController {
             return "redirect:/student/grades";
         }
 
-        gradeDetailService.addGradeDetailsToModel(model, details, subjectId);
+        gradeService.addGradeDetailsToModel(model, details, subjectId);
         return "student/grade/grades-detail";
     }
 }

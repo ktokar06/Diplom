@@ -1,7 +1,7 @@
 package com.example.controller;
 
-import com.example.model.entity.Group;
-import com.example.model.entity.Student;
+import com.example.model.Group;
+import com.example.model.Student;
 import com.example.repository.GroupRepository;
 import com.example.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;

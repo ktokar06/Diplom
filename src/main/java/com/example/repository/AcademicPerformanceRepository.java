@@ -1,6 +1,6 @@
 package com.example.repository;
 
-import com.example.model.entity.AcademicPerformance;
+import com.example.model.AcademicPerformance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

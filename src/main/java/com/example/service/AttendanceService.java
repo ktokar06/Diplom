@@ -1,7 +1,7 @@
 package com.example.service;
 
-import com.example.model.entity.Attendance;
-import com.example.model.entity.Subject;
+import com.example.model.Attendance;
+import com.example.model.Subject;
 import com.example.repository.AttendanceRepository;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
