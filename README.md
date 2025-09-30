@@ -50,7 +50,6 @@ mvn spring-boot:run
 
 ### Frontend
 - **Thymeleaf** - шаблонизатор для HTML
-- **CSS, Bootstrap** - стилизация
 - **JavaScript** - клиентская логика
 
 ### База данных
