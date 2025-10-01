@@ -1,4 +1,4 @@
-# Student Information System (SIS)
+# Diplom_CT_MTUCI
 
 Веб-приложение для управления учебным процессом в образовательном учреждении.
 
