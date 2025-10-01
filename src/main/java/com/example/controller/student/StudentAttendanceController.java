@@ -12,8 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/student")
@@ -25,7 +28,8 @@ public class StudentAttendanceController {
     private final StudentService studentService;
 
     @GetMapping("/attendance")
-    public String attendance(Model model, @AuthenticationPrincipal PersonDetails personDetails) {
+    public String attendance(@RequestParam(value = "semester", required = false) Integer semester,
+                             Model model, @AuthenticationPrincipal PersonDetails personDetails) {
         if (!studentService.isStudentAuthenticated(personDetails)) {
             return "redirect:/login";
         }
@@ -33,17 +37,25 @@ public class StudentAttendanceController {
         Student student = personDetails.student();
         studentService.addCommonAttributes(model, student, "attendance");
 
-        Map<Long, Map<String, Object>> cards = attendanceService.getAttendanceDashboard(student.getId());
+        if (semester == null) {
+            semester = studentService.getCurrentSemester();
+        }
+
+        Map<Long, Map<String, Object>> cards = attendanceService.getAttendanceDashboard(student.getId(), semester);
         Map<Long, String> teacherNames = studentService.buildTeacherNames(cards.keySet());
 
         model.addAttribute("cards", cards);
         model.addAttribute("teacherNames", teacherNames);
+        model.addAttribute("currentSemester", semester);
+        model.addAttribute("availableSemesters", studentService.getAvailableSemesters(student.getId()));
+
         return "student/attendance/attendance";
     }
 
     @GetMapping("/attendance/{subjectId}")
-    public String attendanceDetail(@PathVariable Long subjectId, Model model,
-                                   @AuthenticationPrincipal PersonDetails personDetails) {
+    public String attendanceDetail(@PathVariable Long subjectId,
+                                   @RequestParam(value = "semester", required = false) Integer semester,
+                                   Model model, @AuthenticationPrincipal PersonDetails personDetails) {
         if (!studentService.isStudentAuthenticated(personDetails)) {
             return "redirect:/login";
         }
@@ -51,16 +63,23 @@ public class StudentAttendanceController {
         Student student = personDetails.student();
         studentService.addCommonAttributes(model, student, "attendance");
 
-        Map<String, Object> details = attendanceService.getAttendanceDetails(subjectId, student.getId());
+        if (semester == null) {
+            semester = studentService.getCurrentSemester();
+        }
+
+        Map<String, Object> details = attendanceService.getAttendanceDetails(subjectId, student.getId(), semester);
         if (details == null) {
             return "redirect:/student/attendance";
         }
 
         Set<Long> subjectIds = Collections.singleton(subjectId);
         Map<Long, String> teacherNames = studentService.buildTeacherNames(subjectIds);
-        model.addAttribute("teacherNames", teacherNames);
 
+        model.addAttribute("teacherNames", teacherNames);
+        model.addAttribute("currentSemester", semester);
+        model.addAttribute("availableSemesters", studentService.getAvailableSemesters(student.getId()));
         model.addAllAttributes(details);
+
         return "student/attendance/attendance-detail";
     }
 }

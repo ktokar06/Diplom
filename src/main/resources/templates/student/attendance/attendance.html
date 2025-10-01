@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
   <script>
     tailwind.config = {
         darkMode: "class",
@@ -17,12 +18,6 @@
                     "primary": "#372579",
                     "background-light": "#f5f7f8",
                     "background-dark": "#101722",
-                    "content-light": "#000000",
-                    "content-dark": "#000000",
-                    "subtle-light": "#000000",
-                    "subtle-dark": "#000000",
-                    "border-light": "#e5e7eb",
-                    "border-dark": "#374151"
                 },
                 fontFamily: {
                     "display": ["Montserrat", "sans-serif"]
@@ -64,15 +59,37 @@
       </ol>
     </nav>
 
+    <div class="mb-6 flex justify-end">
+      <div class="relative">
+        <button id="semesterDropdownButton" class="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm font-medium text-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <span class="material-symbols-outlined text-base">school</span>
+          Семестр <span th:text="${currentSemester}"></span>
+          <span class="material-symbols-outlined text-base">expand_more</span>
+        </button>
+
+        <div id="semesterDropdown" class="hidden absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+          <div class="py-1">
+            <th:block th:each="sem : ${availableSemesters}">
+              <a th:href="@{/student/attendance(semester=${sem})}"
+                 class="block px-4 py-2 text-sm text-black hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                 th:classappend="${currentSemester == sem} ? 'bg-primary text-white hover:bg-primary' : ''">
+                Семестр <span th:text="${sem}"></span>
+              </a>
+            </th:block>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="mb-8">
       <h2 class="text-3xl font-bold tracking-tight text-black">Посещаемость</h2>
       <p class="mt-1 text-sm text-black">Статистика посещаемости</p>
     </div>
 
-    <div class="bg-white dark:bg-background-dark/50 rounded-lg shadow-sm overflow-hidden border border-border-light dark:border-border-dark">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
-          <thead class="bg-background-light dark:bg-background-dark/50">
+          <thead class="bg-gray-50 dark:bg-gray-900">
           <tr>
             <th class="px-6 py-4 font-semibold" scope="col">Предмет</th>
             <th class="px-6 py-4 font-semibold text-center" scope="col">Семестр</th>
@@ -82,15 +99,15 @@
             <th class="px-6 py-4 font-semibold text-center" scope="col">Действие</th>
           </tr>
           </thead>
-          <tbody class="divide-y divide-border-light dark:divide-border-dark">
-          <tr class="hover:bg-background-light dark:hover:bg-background-dark/50 transition-colors" th:each="entry : ${cards}">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" th:each="entry : ${cards}">
             <td class="px-6 py-4 whitespace-nowrap font-medium" th:text="${entry.value.subject.name}"></td>
             <td class="px-6 py-4 whitespace-nowrap text-black text-center" th:text="${entry.value.subject.semester}"></td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-green-600 font-semibold" th:text="${entry.value.present}"></td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-red-600 font-semibold" th:text="${entry.value.absent}"></td>
             <td class="px-6 py-4 whitespace-nowrap text-center font-semibold text-black" th:text="${entry.value.total}"></td>
             <td class="px-6 py-4 text-center whitespace-nowrap">
-              <a th:href="@{'/student/attendance/' + ${entry.value.subject.subjectId}}"
+              <a th:href="@{'/student/attendance/' + ${entry.value.subject.subjectId} + '?semester=' + ${currentSemester}}"
                  class="inline-flex items-center justify-center px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
                 Подробнее
               </a>
@@ -108,6 +125,7 @@
   </main>
 </div>
 
+<script src="/js/main.js"></script>
 <script src="/js/header.js"></script>
 </body>
 </html>
