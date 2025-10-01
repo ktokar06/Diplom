@@ -3,6 +3,7 @@ package com.example.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,20 +23,25 @@ public class SummaryService {
      * Включает данные об оценках, посещаемости, среднем балле и общем проценте посещаемости.
      *
      * @param studentId идентификатор студента для получения данных
-     * @return карта, содержащая следующие ключи:
+     * @param semester семестр для фильтрации (может быть null)
+     * @return структура содержащая следующие ключи:
      *         - "gradesData": данные об оценках по предметам
      *         - "attendanceData": данные о посещаемости по предметам
      *         - "overallAvgGrade": средний балл по всем предметам
      *         - "overallAttendance": общий процент посещаемости
      * @throws IllegalArgumentException если studentId равен null
      */
-    public Map<String, Object> getSummaryData(Long studentId) {
+    public Map<String, Object> getSummaryData(Long studentId, Integer semester) {
+        if (studentId == null) {
+            throw new IllegalArgumentException();
+        }
+
         Map<String, Object> summary = new HashMap<>();
 
-        var gradesData = gradeService.getGradesDashboard(studentId);
+        Map<Long, Map<String, Object>> gradesData = gradeService.getGradesDashboard(studentId, semester);
         summary.put("gradesData", gradesData);
 
-        var attendanceData = attendanceService.getAttendanceDashboard(studentId);
+        Map<Long, Map<String, Object>> attendanceData = attendanceService.getAttendanceDashboard(studentId, semester);
         summary.put("attendanceData", attendanceData);
 
         double overallAvgGrade = calculateOverallAvgGrade(gradesData);
@@ -45,6 +51,28 @@ public class SummaryService {
         summary.put("overallAttendance", overallAttendance);
 
         return summary;
+    }
+
+    /**
+     * Формирует сводные данные об успеваемости и посещаемости студента для текущего семестра.
+     *
+     * @param studentId идентификатор студента для получения данных
+     * @return структура с сводными данными
+     */
+    public Map<String, Object> getSummaryData(Long studentId) {
+        Integer currentSemester = getCurrentSemester();
+        return getSummaryData(studentId, currentSemester);
+    }
+
+    /**
+     * Вычисляет текущий семестр на основе текущей даты.
+     *
+     * @return номер текущего семестра (1 или 2)
+     */
+    private Integer getCurrentSemester() {
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH) + 1;
+        return (month >= 2 && month <= 7) ? 2 : 1;
     }
 
     /**
@@ -59,19 +87,20 @@ public class SummaryService {
         double sum = 0.0;
         int count = 0;
 
-        for (var entry : gradesData.entrySet()) {
+        for (Map.Entry<Long, Map<String, Object>> entry : gradesData.entrySet()) {
             Object avgObj = entry.getValue().get("avgGrade");
             if (avgObj != null) {
-                switch (avgObj) {
-                    case Double d -> {
+                if (avgObj instanceof Double) {
+                    Double d = (Double) avgObj;
+                    if (d > 0) {
                         sum += d;
                         count++;
                     }
-                    case Integer i -> {
+                } else if (avgObj instanceof Integer) {
+                    Integer i = (Integer) avgObj;
+                    if (i > 0) {
                         sum += i.doubleValue();
                         count++;
-                    }
-                    default -> {
                     }
                 }
             }
@@ -92,7 +121,7 @@ public class SummaryService {
         long totalPresent = 0;
         long totalClasses = 0;
 
-        for (var entry : attendanceData.entrySet()) {
+        for (Map.Entry<Long, Map<String, Object>> entry : attendanceData.entrySet()) {
             Object presentObj = entry.getValue().get("present");
             Object totalObj = entry.getValue().get("total");
 
@@ -120,17 +149,17 @@ public class SummaryService {
      * @return числовое значение типа long; 0L если конвертация невозможна
      */
     private long convertToLong(Object obj) {
-        return switch (obj) {
-            case Long l -> l;
-            case Integer i -> i.longValue();
-            case String s -> {
-                try {
-                    yield Long.parseLong(s);
-                } catch (NumberFormatException e) {
-                    yield 0L;
-                }
+        if (obj instanceof Long) {
+            return (Long) obj;
+        } else if (obj instanceof Integer) {
+            return ((Integer) obj).longValue();
+        } else if (obj instanceof String) {
+            try {
+                return Long.parseLong((String) obj);
+            } catch (NumberFormatException e) {
+                return 0L;
             }
-            default -> 0L;
-        };
+        }
+        return 0L;
     }
 }

@@ -80,34 +80,34 @@
             </div>
 
             <div class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-                <div class="rounded-xl border border-gray-200/80 dark:border-gray-800/80 bg-background-light dark:bg-background-dark/50 p-4">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm font-medium text-black">Средний балл</p>
                     <p class="mt-1 text-3xl font-bold text-primary" th:text="${#numbers.formatDecimal(avgGrade, 1, 2)} ?: '—'"></p>
                 </div>
-                <div class="rounded-xl border border-gray-200/80 dark:border-gray-800/80 bg-background-light dark:bg-background-dark/50 p-4">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm font-medium text-black">Отлично (5)</p>
                     <p class="mt-1 text-3xl font-bold text-green-600 dark:text-green-500" th:text="${excellentCount}"></p>
                 </div>
-                <div class="rounded-xl border border-gray-200/80 dark:border-gray-800/80 bg-background-light dark:bg-background-dark/50 p-4">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm font-medium text-black">Хорошо (4)</p>
                     <p class="mt-1 text-3xl font-bold text-green-700 dark:text-green-600" th:text="${goodCount}"></p>
                 </div>
-                <div class="rounded-xl border border-gray-200/80 dark:border-gray-800/80 bg-background-light dark:bg-background-dark/50 p-4">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm font-medium text-black">Удовлетворительно (3)</p>
                     <p class="mt-1 text-3xl font-bold text-yellow-600 dark:text-yellow-500" th:text="${satisfactoryCount}"></p>
                 </div>
-                <div class="rounded-xl border border-gray-200/80 dark:border-gray-800/80 bg-background-light dark:bg-background-dark/50 p-4">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm font-medium text-black">Неудовлетворительно (2)</p>
                     <p class="mt-1 text-3xl font-bold text-red-600 dark:text-red-500" th:text="${unsatisfactoryCount}"></p>
                 </div>
             </div>
 
-            <div class="mt-6 bg-white dark:bg-background-dark/50 rounded-xl p-6 shadow-sm">
+            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
                 <div class="flex justify-between text-sm font-medium mb-3">
                     <span class="text-black">Прогресс среднего балла</span>
                     <span class="text-black" th:text="${#numbers.formatDecimal(avgGrade, 1, 2)} ?: '—'"></span>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3">
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                     <div class="bg-primary h-3 rounded-full"
                          th:style="${avgGrade != null and avgGrade > 0} ? 'width: ' + (${avgGrade} * 100 / 5) + '%' : 'width: 0%'"></div>
                 </div>
@@ -116,9 +116,9 @@
             <div class="mt-8 flow-root">
                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <div class="overflow-hidden rounded-lg border border-gray-200/80 dark:border-gray-800/80">
-                            <table class="min-w-full divide-y divide-gray-200/80 dark:divide-gray-800/80">
-                                <thead class="bg-gray-50 dark:bg-gray-900/50">
+                        <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-900">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-black" scope="col">Дата</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-black" scope="col">Тип работы</th>
@@ -126,7 +126,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-black" scope="col">Комментарий преподавателя</th>
                                 </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200/80 dark:divide-gray-800/80 bg-background-light dark:bg-background-dark/50">
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                                 <tr th:each="grade : ${grades}">
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-black"
                                         th:text="${#temporals.format(grade.assessmentDate, 'dd.MM.yyyy')}"></td>
@@ -158,7 +158,7 @@
             </div>
 
             <div class="mt-6">
-                <a th:href="@{/student/grades}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors">
+                <a th:href="@{/student/grades(semester=${currentSemester})}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors">
                     <span class="material-symbols-outlined text-base">arrow_back</span>
                     Назад к списку предметов
                 </a>
@@ -167,6 +167,7 @@
     </main>
 </div>
 
+<script src="/js/main.js"></script>
 <script src="/js/header.js"></script>
 </body>
 </html>
