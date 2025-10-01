@@ -37,7 +37,10 @@ public class StudentSummaryController {
         }
 
         Object summaryData = summaryService.getSummaryData(student.getId(), semester);
+        Object trendData = summaryService.getSemesterTrendData(student.getId());
+
         model.addAttribute("summaryData", summaryData);
+        model.addAttribute("trendData", trendData);
         model.addAttribute("currentSemester", semester);
         model.addAttribute("availableSemesters", studentService.getAvailableSemesters(student.getId()));
 
